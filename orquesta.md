@@ -988,7 +988,8 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
    - memory MCP → guardar hallazgos técnicos importantes
    - Actualizar MiVault/STATE.md si hubo avance en proyecto
    - Crear MiVault/diario/[fecha].md si fue sesión significativa
-   - **AUTOMÁTICO al cerrar**: el hook SessionEnd ejecuta `obsidian-save.ps1` que lee el transcript y guarda los temas reales en `/diario/[fecha].md` — usar `/exit` para cerrar limpiamente (tarda ~5 segundos)
+   - **EN TIEMPO REAL** (opcional): ejecutar `/obsidian-sync` al inicio de la sesión — activa `obsidian-live-sync.cjs` en background, sincroniza cada mensaje al vault automáticamente
+   - **AUTOMÁTICO al cerrar**: el hook SessionEnd ejecuta `obsidian-session-end.cjs` — guarda resumen final en `/diario/[fecha].md` al hacer `/exit`
 9. REPORTAR → qué se hizo, con qué herramientas, próximos pasos
 ```
 
@@ -1093,6 +1094,23 @@ Configurado en `~/.claude/settings.json` como hook de tipo `command` en el event
 3. Los inyecta como `systemMessage` en el contexto de Claude antes del primer mensaje
 
 **Resultado**: Claude ya sabe el estado de los proyectos activos y las convenciones del vault desde el primer mensaje — sin que el usuario tenga que pedirlo.
+
+---
+
+#### Sincronización Live — `/obsidian-sync` (OPCIONAL, por sesión)
+
+Comando disponible como `/obsidian-sync`. Inicia `~/.claude/helpers/obsidian-live-sync.cjs` como proceso background que monitorea el transcript JSONL en **tiempo real**.
+
+**Cómo usarlo**: escribir `/obsidian-sync` una sola vez al inicio de la sesión.
+
+**Qué hace en tiempo real**:
+- Detecta mensajes nuevos del usuario via `fs.watch` (fallback: polling cada 3s)
+- Escribe cada mensaje en `/diario/[fecha].md` bajo `## Actividad en tiempo real`
+- Crea notas atómicas en `/conceptos/[término].md` cuando detecta términos técnicos
+- Evita duplicados con `.obsidian-sync-state.json`
+- Funciona complementario con el hook SessionEnd (que hace el resumen final)
+
+**Cuándo usarlo**: cuando quieras ver el vault actualizándose mientras trabajas, sin esperar al cierre de sesión.
 
 ---
 
