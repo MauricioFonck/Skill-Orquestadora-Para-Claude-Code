@@ -1097,7 +1097,7 @@ Configurado en `~/.claude/settings.json` como hook de tipo `command` en el event
 ---
 
 #### Hook SessionEnd — Guardado Automático en Obsidian (GLOBAL)
-Configurado en `~/.claude/settings.json` como hook de tipo `command` en el evento `SessionEnd`. Script: `~/.claude/helpers/obsidian-save.ps1`. Se activa automáticamente al cerrar Claude Code **desde cualquier directorio**.
+Configurado en `~/.claude/settings.json` como hook de tipo `command` en el evento `SessionEnd`. Script: `~/.claude/helpers/obsidian-session-end.cjs`. Se activa automáticamente al cerrar Claude Code **desde cualquier directorio**.
 
 **Qué hace el script**:
 1. Lee el transcript JSONL de la sesión (ruta recibida del hook, o busca el más reciente en `~/.claude/projects/`)
