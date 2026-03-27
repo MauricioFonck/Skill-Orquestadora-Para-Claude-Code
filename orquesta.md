@@ -873,6 +873,68 @@ sparc:spec-pseudocode → sparc:architect → sparc:code → sparc:tdd → sparc
 
 ---
 
+### CATEGORIA T — Video & Motion Graphics (Remotion)
+**Señales**: "video", "animación", "motion graphics", "remotion", "render MP4", "kinetic typography", "social content", "producto demo", "bar chart animado", "template 9:16", "video programático"
+
+> **Proyecto base**: `C:/Users/Andrea/remotion-demo/` — ya configurado con Docker, listo para renderizar.
+
+**Stack instalado**:
+- `remotion` + `@remotion/player` + `@remotion/cli` — motor de video en React
+- Skill `remotion-best-practices` — instalada en `~/.agents/skills/remotion-best-practices`
+- Docker 100% headless — render sin GUI, sin instalar nada local
+
+**Flujo de trabajo**:
+```
+CREAR componente en src/[Nombre].tsx (React + Remotion hooks)
+  → Registrar en src/Root.tsx como <Composition>
+  → Renderizar: npm run docker:render → sale en ./out/[Nombre].mp4
+  → Preview visual: npm run docker:studio → http://localhost:3000
+```
+
+**Hooks Remotion más usados**:
+| Hook | Para qué |
+|------|----------|
+| `useCurrentFrame()` | Frame actual (0 a durationInFrames) |
+| `useVideoConfig()` | fps, width, height, durationInFrames |
+| `interpolate(frame, [from], [to])` | Animar cualquier valor entre frames |
+| `spring({frame, fps})` | Animación física con rebote |
+| `AbsoluteFill` | Contenedor que ocupa todo el canvas |
+| `Sequence` | Sincronizar múltiples componentes en el tiempo |
+
+**Casos de uso**:
+| Tipo | Ejemplo de prompt |
+|------|-------------------|
+| Motion Graphics | "Genera animación de bar chart creciente para presentación de cliente" |
+| Social Content | "Crea template 9:16 con texto animado sincronizado a 120BPM" |
+| Product Demo | "Construye walkthrough de UI con colores de mi marca" |
+| Múltiples versiones | "Haz 5 versiones del video con distintos titulares" |
+
+**Comandos Docker**:
+```bash
+npm run docker:render   # Genera MP4 en ./out/
+npm run docker:studio   # Preview en http://localhost:3000
+docker compose build    # Reconstruir imagen (si cambia Dockerfile)
+```
+
+**Squad de 10 agentes**:
+
+| # | Dimensión | Agente |
+|---|-----------|--------|
+| 1 | Líder / Principal | `frontend-developer` |
+| 2 | Soporte Técnico | `react-specialist` |
+| 3 | Arquitecto | `architect-reviewer` |
+| 4 | Calidad / QA | `qa-expert` |
+| 5 | Seguridad | `security-engineer` |
+| 6 | Testing / Integración | `test-automator` |
+| 7 | Documentación | `documentation-engineer` |
+| 8 | Optimización | `performance-engineer` |
+| 9 | Refactoring | `refactoring-specialist` |
+| 10 | DevEx / Automatización | `docker-expert` |
+
+**Skills**: `/sc:implement` para componentes React/Remotion, `/sc:design` para storyboard
+
+---
+
 ## Fase 2 — Estrategia de Ejecución (Arquitectura v2)
 
 ### Modo PARALELO (por defecto — 10 agentes por categoría)
@@ -1072,6 +1134,12 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 - **claude-flow** → 170+ herramientas swarm, SONA neural router (89% accuracy), AgentDB vector DB, 5 consensus protocols, 75% reducción de costos API
 - **nanobanana** → Gemini API vía MCP: visión, texto, multimodal, embeddings — usa `GEMINI_API_KEY` de Google AI Studio
 - **magic** (21st.dev) → generación de componentes UI React con múltiples variantes de estilo — usa `TWENTY_FIRST_API_KEY` de 21st.dev
+
+### Remotion — Video Programático
+- **Proyecto**: `C:/Users/Andrea/remotion-demo/` — configurado con Docker headless
+- **Skill**: `remotion-best-practices` instalada en `~/.agents/skills/remotion-best-practices`
+- **Render**: `npm run docker:render` → MP4 en `./out/` | `npm run docker:studio` → preview en localhost:3000
+- **Base image**: `node:20-bookworm-slim` + Chromium headless — sin dependencias locales
 
 ### Herramientas Globales Instaladas
 - **GSD v1.29.0** (`get-shit-done-cc`) → meta-prompting y spec-driven development. 50+ comandos `/gsd:*`. Flujo: `new-project → plan-phase → execute-phase → ship`. Instala en `~/.claude/commands/gsd/`.
