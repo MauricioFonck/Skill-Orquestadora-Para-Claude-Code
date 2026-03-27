@@ -1081,6 +1081,18 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 - **Estructura**: `/conceptos` (notas atómicas con wikilinks), `/proyectos` (STATE.md por proyecto), `/diario` (resúmenes diarios)
 - **Cuándo actualizar manualmente**: al terminar trabajo significativo → actualizar `STATE.md` + crear `diario/[fecha].md`
 
+#### Hook SessionStart — Contexto Automático del Vault (GLOBAL)
+Configurado en `~/.claude/settings.json` como hook de tipo `command` en el evento `SessionStart`. Script: `~/.claude/helpers/obsidian-context.cjs`.
+
+**Qué hace**: Al iniciar cualquier sesión de Claude Code (desde cualquier directorio):
+1. Lee `C:/Users/Andrea/Documents/MiVault/STATE.md`
+2. Lee `C:/Users/Andrea/Documents/MiVault/CLAUDE.md`
+3. Los inyecta como `systemMessage` en el contexto de Claude antes del primer mensaje
+
+**Resultado**: Claude ya sabe el estado de los proyectos activos y las convenciones del vault desde el primer mensaje — sin que el usuario tenga que pedirlo.
+
+---
+
 #### Hook SessionEnd — Guardado Automático con IA (GLOBAL)
 Configurado en `~/.claude/settings.json` como hook de tipo `agent` en el evento `SessionEnd`. Se activa automáticamente al cerrar Claude Code **desde cualquier directorio**.
 
