@@ -988,7 +988,7 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
    - memory MCP → guardar hallazgos técnicos importantes
    - Actualizar MiVault/STATE.md si hubo avance en proyecto
    - Crear MiVault/diario/[fecha].md si fue sesión significativa
-   - **AUTOMÁTICO al cerrar**: el hook SessionEnd lanza un agente IA que clasifica el transcript y guarda DIARIO + CONCEPTOS + PROYECTOS en el vault automáticamente — no es necesario hacerlo manualmente si Claude Code se cierra normalmente
+   - **AUTOMÁTICO al cerrar**: el hook SessionEnd ejecuta `obsidian-save.ps1` que lee el transcript y guarda los temas reales en `/diario/[fecha].md` — usar `/exit` para cerrar limpiamente (tarda ~5 segundos)
 9. REPORTAR → qué se hizo, con qué herramientas, próximos pasos
 ```
 
@@ -1096,17 +1096,16 @@ Configurado en `~/.claude/settings.json` como hook de tipo `command` en el event
 
 ---
 
-#### Hook SessionEnd — Guardado Automático con IA (GLOBAL)
-Configurado en `~/.claude/settings.json` como hook de tipo `agent` en el evento `SessionEnd`. Se activa automáticamente al cerrar Claude Code **desde cualquier directorio**.
+#### Hook SessionEnd — Guardado Automático en Obsidian (GLOBAL)
+Configurado en `~/.claude/settings.json` como hook de tipo `command` en el evento `SessionEnd`. Script: `~/.claude/helpers/obsidian-save.ps1`. Se activa automáticamente al cerrar Claude Code **desde cualquier directorio**.
 
-**Qué hace el agente**:
-1. Lee el transcript JSONL de la sesión (o busca el más reciente en `~/.claude/projects/`)
-2. Extrae los últimos mensajes reales del usuario (filtra comandos `/`, `!`, y tags `<`)
-3. Clasifica el contenido en 3 categorías:
-   - **DIARIO** → siempre guarda en `/diario/[YYYY-MM-DD].md` con resumen y temas tratados
-   - **CONCEPTOS** → crea/actualiza notas atómicas en `/conceptos/[concepto].md` con wikilinks (solo términos técnicos reales)
-   - **PROYECTOS** → actualiza `/proyectos/[nombre]/STATE.md` si se trabajó en un proyecto nombrado
+**Qué hace el script**:
+1. Lee el transcript JSONL de la sesión (ruta recibida del hook, o busca el más reciente en `~/.claude/projects/`)
+2. Extrae los mensajes reales del usuario (filtra `isMeta`, comandos `/`, `!`, y tags `<`)
+3. Guarda en `/diario/[YYYY-MM-DD].md` con los temas reales de la conversación
 4. Actualiza `STATE.md` con la fecha/hora de última actualización
+
+**Cómo cerrar para que funcione**: usar `/exit` en el chat — Claude Code cierra limpiamente y el script termina en ~5 segundos. Cerrar con la X del sistema puede interrumpirlo.
 
 **Scope global**: funciona al cerrar Claude Code desde VS Code, terminal, o cualquier proyecto — no solo desde el vault.
 
