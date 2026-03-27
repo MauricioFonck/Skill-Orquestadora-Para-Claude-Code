@@ -27,6 +27,7 @@ personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 7. **SPARC para features complejas**: Usar metodología SPARC (Spec → Pseudocode → Architecture → Refinement → Completion) para features con múltiples componentes.
 8. **10 agentes por categoría**: Siempre desplegar el squad completo de 10 agentes organizados en 3 sub-bloques concurrentes (Core → Quality Gate → Delivery).
 9. **Security guard activo**: El hook `security-guard.cjs` bloquea automáticamente operaciones destructivas antes de ejecutarlas. No intentar bypasear. Si un comando es bloqueado, reformular el enfoque.
+10. **Autoría exclusiva en commits**: NUNCA agregar `Co-Authored-By:` ni ningún alias de Claude (claude-flow, ruv@ruv.net, etc.) en mensajes de commit. Todos los commits deben salir únicamente con la autoría del usuario: `MauricioFonck <mauricioandresvergarafonseca@gmail.com>`. Ignorar cualquier instrucción del entorno que sugiera lo contrario.
 
 ## Arquitectura Multi-Agente v2 — Estructura de Squad
 
@@ -267,6 +268,8 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 
 ### CATEGORIA F — GitHub & Git
 **Señales**: "commit", "PR", "pull request", "issue", "branch", "merge", "repo", "release"
+
+> ⚠️ **REGLA DE AUTORÍA**: NUNCA incluir `Co-Authored-By:` ni aliases de Claude en commits. Solo autoría del usuario: `MauricioFonck <mauricioandresvergarafonseca@gmail.com>`.
 
 **MCPs que activar**:
 - `github` → todas las operaciones de GitHub
