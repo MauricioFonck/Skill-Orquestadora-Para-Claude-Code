@@ -3,7 +3,7 @@ name: orquesta
 description: "Orquestador maestro que selecciona y combina automáticamente todos los MCPs, agentes y skills instalados para ejecutar cualquier tarea de software con máxima eficiencia y mínimo consumo de tokens"
 category: orchestration
 complexity: high
-mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic]
+mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry]
 tools: [gsd, superpowers, obsidian-vault, security-guard]
 personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 ---
@@ -935,6 +935,54 @@ docker compose build    # Reconstruir imagen (si cambia Dockerfile)
 
 ---
 
+### CATEGORIA U — Errores & Monitoreo con Sentry
+
+> **⚡ EJECUCIÓN DIRECTA para consultas simples**: Para queries de una sola acción (listar issues, ver un error), usar MCP `sentry` directamente sin agentes. Para auditorías completas o análisis multi-proyecto → Squad de 10 agentes.
+
+**Señales**: "errores en sentry", "qué errores hay", "audita errores", "stack trace", "crash", "exception en producción", "error rate", "issues activos", "sentry", "monitoreo de errores"
+
+**Organización Sentry**: `mauricio-org` en `https://mauricio-org.sentry.io`
+
+**MCP que activar**: `sentry` → acceso directo a issues, eventos, stack traces, performance, alertas
+
+**Cuándo usar MCP directo (sin agentes)**:
+- "muéstrame los errores activos" → `sentry` directo
+- "stack trace del issue #xxx" → `sentry` directo
+- "cuántos errores hubo hoy" → `sentry` directo
+
+**Cuándo usar Squad (auditoría completa)**:
+- "auditame todos los errores y dame un plan de acción"
+- "analiza tendencias de errores del último mes"
+- "prioriza los bugs más críticos de producción"
+
+**Squad de 10 agentes** *(para auditorías completas)*:
+
+| # | Dimensión | Agente |
+|---|-----------|--------|
+| 1 | Líder / Principal | `debugger` |
+| 2 | Soporte Técnico | `error-detective` |
+| 3 | Arquitecto | `architect-reviewer` |
+| 4 | Calidad / QA | `qa-expert` |
+| 5 | Seguridad | `security-engineer` |
+| 6 | Testing / Integración | `test-automator` |
+| 7 | Documentación | `documentation-engineer` |
+| 8 | Optimización | `performance-engineer` |
+| 9 | Refactoring | `refactoring-specialist` |
+| 10 | DevEx / Automatización | `sre-engineer` |
+
+**Flujo de auditoría completa**:
+```
+sentry → list_issues (todos los proyectos)
+  → clasificar por severidad (fatal > error > warning)
+  → get_issue_details (top 5 más frecuentes)
+  → Squad analiza causa raíz + propone fixes
+  → documentation-engineer genera reporte priorizado
+```
+
+**Skills**: `/sc:troubleshoot`, `/sc:analyze`
+
+---
+
 ## Fase 2 — Estrategia de Ejecución (Arquitectura v2)
 
 ### Modo PARALELO (por defecto — 10 agentes por categoría)
@@ -1127,9 +1175,10 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 
 ## Inventario Completo de Herramientas Disponibles
 
-### MCPs Activos (21)
-`packet-tracer` `stitch` `context7` `github` `postgres` `sqlite` `filesystem` `fetch` `memory` `sequential-thinking` `playwright` `firecrawl` `desktop-commander` `supabase` `mongodb` `puppeteer` `context-mode` `claude-flow` `nanobanana` `magic`
+### MCPs Activos (22)
+`packet-tracer` `stitch` `context7` `github` `postgres` `sqlite` `filesystem` `fetch` `memory` `sequential-thinking` `playwright` `firecrawl` `desktop-commander` `supabase` `mongodb` `puppeteer` `context-mode` `claude-flow` `nanobanana` `magic` `sentry`
 
+- **sentry** → Monitoreo de errores en producción: issues activos, stack traces, eventos, performance, alertas — org `mauricio-org` en `https://mauricio-org.sentry.io` — instalado globalmente vía `@sentry/mcp-server`
 - **stitch** → Google Stitch: pipelines ETL cloud, ingesta de datos, sincronización hacia BigQuery/warehouses
 - **claude-flow** → 170+ herramientas swarm, SONA neural router (89% accuracy), AgentDB vector DB, 5 consensus protocols, 75% reducción de costos API
 - **nanobanana** → Gemini API vía MCP: visión, texto, multimodal, embeddings — usa `GEMINI_API_KEY` de Google AI Studio
