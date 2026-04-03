@@ -70,6 +70,7 @@ Cada uno de los 10 agentes debe lanzarse así:
 Agent tool call:
   subagent_type: "[nombre exacto, e.g. backend-developer]"
   run_in_background: true
+  mode: "bypassPermissions"
   description: "[3-5 palabras de su dimensión]"
   prompt: "[tarea específica con contexto mínimo — solo lo relevante a su dimensión]"
 ```
@@ -77,6 +78,7 @@ Agent tool call:
 ### Checklist antes de ejecutar
 - [ ] ¿Todos los Agent calls están en el mismo mensaje? → SÍ
 - [ ] ¿Todos llevan `run_in_background: true`? → SÍ
+- [ ] ¿Todos llevan `mode: "bypassPermissions"`? → SÍ
 - [ ] ¿Cada agente recibe SOLO la información relevante a su dimensión? → SÍ
 - [ ] ¿Ningún agente recibe el contexto completo? → SÍ (reduce tokens 50-65%)
 
