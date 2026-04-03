@@ -110,12 +110,12 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | Vue | `vue-expert` | `typescript-pro` |
 | Angular | `angular-architect` | `typescript-pro` |
 | Python / Django | `django-developer` o `python-pro` | `backend-developer` |
-| Python / FastAPI | `wshobson-api-scaffolding-fastapi-pro` | `backend-developer` |
+| Python / FastAPI | `fastapi-pro` | `backend-developer` |
 | Node.js / Express | `backend-developer` | `javascript-pro` |
 | Java / Spring | `spring-boot-engineer` | `java-architect` |
 | Go | `golang-pro` | `backend-developer` |
 | Rust | `rust-engineer` | `backend-developer` |
-| C# / .NET | `csharp-developer` o `dotnet-core-expert` | `wshobson-dotnet-contribution-dotnet-architect` |
+| C# / .NET | `csharp-developer` o `dotnet-core-expert` | `dotnet-architect` |
 | PHP / Laravel | `laravel-specialist` | `php-pro` |
 | Ruby / Rails | `rails-expert` | `backend-developer` |
 | Kotlin / Android | `kotlin-specialist` | `mobile-developer` |
@@ -123,12 +123,12 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | Flutter | `flutter-expert` | `mobile-developer` |
 | React Native | `mobile-developer` | `react-specialist` |
 | Electron | `electron-pro` | `javascript-pro` |
-| GraphQL | `graphql-architect` | `wshobson-backend-development-graphql-architect` |
-| Elixir | `elixir-expert` | `wshobson-functional-programming-elixir-pro` |
-| C / C++ | `cpp-pro` | `wshobson-systems-programming-c-pro` |
-| Embedded / ARM | `embedded-systems` | `wshobson-arm-cortex-microcontrollers-arm-cortex-expert` |
+| GraphQL | `graphql-architect` | `backend-architect` |
+| Elixir | `elixir-expert` | `elixir-pro` |
+| C / C++ | `cpp-pro` | `c-pro` |
+| Embedded / ARM | `embedded-systems` | `arm-cortex-expert` |
 | Full-stack genérico | `fullstack-developer` | `api-designer` |
-| Microservicios | `microservices-architect` | `wshobson-backend-development-backend-architect` |
+| Microservicios | `microservices-architect` | `backend-architect` |
 | WebSockets / Tiempo real | `websocket-engineer` | `backend-developer` |
 
 **8 agentes fijos (se agregan a TODOS los stacks)**:
@@ -168,14 +168,14 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | # | Dimensión | Agente |
 |---|-----------|--------|
 | 1 | Líder / Principal | `postgres-pro` o `sql-pro` *(según BD detectada)* |
-| 2 | Soporte Técnico | `wshobson-database-design-database-architect` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
-| 4 | Calidad / QA | `wshobson-database-migrations-database-admin` |
-| 5 | Seguridad | `wshobson-backend-api-security-backend-security-coder` |
+| 2 | Soporte Técnico | `database-architect` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `database-admin` |
+| 5 | Seguridad | `backend-security-coder` |
 | 6 | Testing / Integración | `test-automator` |
-| 7 | Documentación | `wshobson-code-documentation-docs-architect` |
+| 7 | Documentación | `docs-architect` |
 | 8 | Optimización | `database-optimizer` |
-| 9 | Refactoring | `wshobson-observability-monitoring-database-optimizer` |
+| 9 | Refactoring | `observability-engineer` |
 | 10 | DevEx / Automatización | `devops-engineer` |
 
 **Skills**: `/sc:implement` para migraciones, `/sc:analyze` para optimización
@@ -197,14 +197,14 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `debugger` |
 | 2 | Soporte Técnico | `error-detective` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
-| 4 | Calidad / QA | `wshobson-error-diagnostics-debugger` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `devops-troubleshooter` |
 | 5 | Seguridad | `security-engineer` |
-| 6 | Testing / Integración | `wshobson-debugging-toolkit-debugger` |
+| 6 | Testing / Integración | `team-debugger` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `performance-engineer` |
-| 9 | Refactoring | `wshobson-error-debugging-debugger` |
-| 10 | DevEx / Automatización | `wshobson-distributed-debugging-devops-troubleshooter` |
+| 9 | Refactoring | `error-coordinator` |
+| 10 | DevEx / Automatización | `devops-incident-responder` |
 
 **Skills**: `/sc:troubleshoot` como orquestador, `/sc:analyze` para análisis de código
 
@@ -225,13 +225,13 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `test-automator` |
 | 2 | Soporte Técnico | `qa-expert` |
-| 3 | Arquitecto | `wshobson-backend-development-tdd-orchestrator` |
-| 4 | Calidad / QA | `wshobson-comprehensive-review-code-reviewer` |
+| 3 | Arquitecto | `tdd-orchestrator` |
+| 4 | Calidad / QA | `code-analyzer` |
 | 5 | Seguridad | `security-engineer` |
-| 6 | Testing / Integración | `wshobson-performance-testing-review-performance-engineer` |
-| 7 | Documentación | `wshobson-code-documentation-docs-architect` |
+| 6 | Testing / Integración | `performance-benchmarker` |
+| 7 | Documentación | `docs-architect` |
 | 8 | Optimización | `performance-engineer` |
-| 9 | Refactoring | `wshobson-codebase-cleanup-test-automator` |
+| 9 | Refactoring | `tdd-london-swarm` |
 | 10 | DevEx / Automatización | `accessibility-tester` |
 
 **Skills**: `/sc:test` principal
@@ -255,12 +255,12 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | 2 | Soporte Técnico | `docker-expert` o `kubernetes-specialist` *(según contexto)* |
 | 3 | Arquitecto | `cloud-architect` |
 | 4 | Calidad / QA | `sre-engineer` |
-| 5 | Seguridad | `wshobson-cloud-infrastructure-hybrid-cloud-architect` |
-| 6 | Testing / Integración | `wshobson-cicd-automation-deployment-engineer` |
+| 5 | Seguridad | `hybrid-cloud-architect` |
+| 6 | Testing / Integración | `deployment-engineer` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `platform-engineer` |
-| 9 | Refactoring | `wshobson-cicd-automation-terraform-specialist` |
-| 10 | DevEx / Automatización | `wshobson-kubernetes-operations-kubernetes-architect` |
+| 9 | Refactoring | `terraform-specialist` |
+| 10 | DevEx / Automatización | `kubernetes-architect` |
 
 **Skills**: `/sc:build` + `/sc:workflow`
 
@@ -281,7 +281,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | # | Dimensión | Agente |
 |---|-----------|--------|
 | 1 | Líder / Principal | `git-workflow-manager` |
-| 2 | Soporte Técnico | `wshobson-git-pr-workflows-code-reviewer` |
+| 2 | Soporte Técnico | `code-reviewer` |
 | 3 | Arquitecto | `architect-reviewer` |
 | 4 | Calidad / QA | `code-reviewer` |
 | 5 | Seguridad | `security-auditor` |
@@ -311,14 +311,14 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `research-analyst` |
 | 2 | Soporte Técnico | `documentation-engineer` |
-| 3 | Arquitecto | `wshobson-code-documentation-docs-architect` |
-| 4 | Calidad / QA | `wshobson-comprehensive-review-code-reviewer` |
+| 3 | Arquitecto | `docs-architect` |
+| 4 | Calidad / QA | `code-analyzer` |
 | 5 | Seguridad | `security-auditor` |
 | 6 | Testing / Integración | `search-specialist` |
-| 7 | Documentación | `wshobson-code-documentation-tutorial-engineer` |
+| 7 | Documentación | `tutorial-engineer` |
 | 8 | Optimización | `context-manager` |
 | 9 | Refactoring | `technical-writer` |
-| 10 | DevEx / Automatización | `wshobson-documentation-generation-api-documenter` |
+| 10 | DevEx / Automatización | `api-documenter` |
 
 **Skills**: `/sc:document`, `/sc:research`, `/sc:explain`
 
@@ -339,11 +339,11 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `security-auditor` |
 | 2 | Soporte Técnico | `penetration-tester` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
-| 4 | Calidad / QA | `wshobson-security-scanning-security-auditor` |
-| 5 | Seguridad | `wshobson-backend-api-security-backend-security-coder` |
-| 6 | Testing / Integración | `wshobson-frontend-mobile-security-frontend-developer` |
-| 7 | Documentación | `wshobson-security-compliance-security-auditor` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `ad-security-reviewer` |
+| 5 | Seguridad | `backend-security-coder` |
+| 6 | Testing / Integración | `frontend-developer` |
+| 7 | Documentación | `security-auditor` |
 | 8 | Optimización | `compliance-auditor` |
 | 9 | Refactoring | `security-engineer` |
 | 10 | DevEx / Automatización | `powershell-security-hardening` |
@@ -366,13 +366,13 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `code-reviewer` |
 | 2 | Soporte Técnico | `refactoring-specialist` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
-| 4 | Calidad / QA | `wshobson-comprehensive-review-code-reviewer` |
-| 5 | Seguridad | `wshobson-comprehensive-review-security-auditor` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `code-analyzer` |
+| 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `test-automator` |
-| 7 | Documentación | `wshobson-code-documentation-docs-architect` |
+| 7 | Documentación | `docs-architect` |
 | 8 | Optimización | `performance-engineer` |
-| 9 | Refactoring | `wshobson-codebase-cleanup-code-reviewer` |
+| 9 | Refactoring | `code-analyzer` |
 | 10 | DevEx / Automatización | `dependency-manager` |
 
 **Skills**: `/sc:improve`, `/sc:cleanup`, `/sc:analyze`
@@ -400,8 +400,8 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | 1 | Líder / Principal | `ui-designer` |
 | 2 | Soporte Técnico | `frontend-developer` |
 | 3 | Arquitecto | `architect-reviewer` |
-| 4 | Calidad / QA | `wshobson-accessibility-compliance-ui-visual-validator` |
-| 5 | Seguridad | `wshobson-frontend-mobile-security-frontend-developer` |
+| 4 | Calidad / QA | `ui-visual-validator` |
+| 5 | Seguridad | `frontend-developer` |
 | 6 | Testing / Integración | `test-automator` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `performance-engineer` |
@@ -427,13 +427,13 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `ai-engineer` |
 | 2 | Soporte Técnico | `llm-architect` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
+| 3 | Arquitecto | `architect-review` |
 | 4 | Calidad / QA | `ml-engineer` |
 | 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `machine-learning-engineer` |
-| 7 | Documentación | `wshobson-machine-learning-ops-data-scientist` |
+| 7 | Documentación | `mlops-engineer` |
 | 8 | Optimización | `prompt-engineer` |
-| 9 | Refactoring | `wshobson-llm-application-dev-ai-engineer` |
+| 9 | Refactoring | `llm-architect` |
 | 10 | DevEx / Automatización | `nlp-engineer` |
 
 **Skills**: `/sc:design` para arquitectura, `/sc:implement` para código
@@ -454,14 +454,14 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 |---|-----------|--------|
 | 1 | Líder / Principal | `data-analyst` |
 | 2 | Soporte Técnico | `data-engineer` |
-| 3 | Arquitecto | `wshobson-data-engineering-backend-architect` |
+| 3 | Arquitecto | `data-engineer` |
 | 4 | Calidad / QA | `data-scientist` |
 | 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `test-automator` |
-| 7 | Documentación | `wshobson-business-analytics-business-analyst` |
+| 7 | Documentación | `business-analyst` |
 | 8 | Optimización | `database-optimizer` |
 | 9 | Refactoring | `data-researcher` |
-| 10 | DevEx / Automatización | `wshobson-quantitative-trading-quant-analyst` |
+| 10 | DevEx / Automatización | `quant-analyst` |
 
 **Skills**: `/sc:analyze`, `/sc:research`
 
@@ -633,14 +633,14 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 | # | Dimensión | Agente |
 |---|-----------|--------|
 | 1 | Líder / Principal | `performance-engineer` |
-| 2 | Soporte Técnico | `wshobson-application-performance-performance-engineer` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
-| 4 | Calidad / QA | `wshobson-performance-testing-review-performance-engineer` |
+| 2 | Soporte Técnico | `performance-monitor` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `performance-benchmarker` |
 | 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `test-automator` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `database-optimizer` |
-| 9 | Refactoring | `wshobson-application-performance-observability-engineer` |
+| 9 | Refactoring | `observability-engineer` |
 | 10 | DevEx / Automatización | `sre-engineer` |
 
 **Skills**: `/sc:analyze`, `/sc:improve`
@@ -668,7 +668,7 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 |---|-----------|--------|
 | 1 | Líder / Principal | `data-researcher` |
 | 2 | Soporte Técnico | `data-engineer` |
-| 3 | Arquitecto | `wshobson-data-engineering-backend-architect` |
+| 3 | Arquitecto | `data-engineer` |
 | 4 | Calidad / QA | `qa-expert` |
 | 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `test-automator` |
@@ -712,9 +712,9 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 | 1 | Líder / Principal | `project-manager` |
 | 2 | Soporte Técnico | `product-manager` |
 | 3 | Arquitecto | `architect-reviewer` |
-| 4 | Calidad / QA | `wshobson-comprehensive-review-architect-review` |
+| 4 | Calidad / QA | `architect-review` |
 | 5 | Seguridad | `risk-manager` |
-| 6 | Testing / Integración | `wshobson-conductor-conductor-validator` |
+| 6 | Testing / Integración | `conductor-validator` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `performance-engineer` |
 | 9 | Refactoring | `scrum-master` |
@@ -738,8 +738,8 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 | # | Dimensión | Agente |
 |---|-----------|--------|
 | 1 | Líder / Principal | `data-engineer` |
-| 2 | Soporte Técnico | `wshobson-data-engineering-backend-architect` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
+| 2 | Soporte Técnico | `data-engineer` |
+| 3 | Arquitecto | `architect-review` |
 | 4 | Calidad / QA | `data-analyst` |
 | 5 | Seguridad | `security-engineer` |
 | 6 | Testing / Integración | `test-automator` |
@@ -786,7 +786,7 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 | 6 | Testing / Integración | `machine-learning-engineer` |
 | 7 | Documentación | `documentation-engineer` |
 | 8 | Optimización | `prompt-engineer` |
-| 9 | Refactoring | `wshobson-llm-application-dev-ai-engineer` |
+| 9 | Refactoring | `llm-architect` |
 | 10 | DevEx / Automatización | `devops-engineer` |
 
 **Skills**: `/sc:implement` para integración, `/sc:design` para arquitectura
@@ -860,14 +860,14 @@ sparc:spec-pseudocode → sparc:architect → sparc:code → sparc:tdd → sparc
 |---|-----------|--------|
 | 1 | Líder / Principal | `business-analyst` |
 | 2 | Soporte Técnico | `market-researcher` |
-| 3 | Arquitecto | `wshobson-comprehensive-review-architect-review` |
+| 3 | Arquitecto | `architect-review` |
 | 4 | Calidad / QA | `competitive-analyst` |
-| 5 | Seguridad | `wshobson-startup-business-analyst-startup-analyst` |
+| 5 | Seguridad | `startup-analyst` |
 | 6 | Testing / Integración | `trend-analyst` |
 | 7 | Documentación | `content-marketer` |
 | 8 | Optimización | `seo-specialist` |
-| 9 | Refactoring | `wshobson-seo-content-creation-seo-content-auditor` |
-| 10 | DevEx / Automatización | `wshobson-seo-technical-optimization-seo-keyword-strategist` |
+| 9 | Refactoring | `seo-content-auditor` |
+| 10 | DevEx / Automatización | `seo-keyword-strategist` |
 
 **Skills**: `/sc:research`, `/sc:business-panel`
 
