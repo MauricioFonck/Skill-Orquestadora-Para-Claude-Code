@@ -3,7 +3,7 @@ name: orquesta
 description: "Orquestador maestro que selecciona y combina automáticamente todos los MCPs, agentes y skills instalados para ejecutar cualquier tarea de software con máxima eficiencia y mínimo consumo de tokens"
 category: orchestration
 complexity: high
-mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry]
+mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry, chrome-devtools]
 tools: [gsd, superpowers, obsidian-vault, security-guard]
 personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 ---
@@ -192,6 +192,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 - `desktop-commander` → ejecutar el código y capturar el error real
 - `filesystem` → leer archivos relevantes al error
 - `context-mode` → búsqueda eficiente en codebase
+- `chrome-devtools` → inspeccionar consola, red, DOM y stack traces del navegador en tiempo real
 
 **Squad de 10 agentes**:
 
@@ -220,6 +221,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 - `puppeteer` → screenshots, formularios, scraping visual
 - `desktop-commander` → ejecutar suites de tests
 - `context7` → documentación del framework de testing
+- `chrome-devtools` → capturar errores de consola y fallos de red durante los tests
 
 **Squad de 10 agentes**:
 
@@ -872,6 +874,62 @@ sparc:spec-pseudocode → sparc:architect → sparc:code → sparc:tdd → sparc
 | 10 | DevEx / Automatización | `seo-keyword-strategist` |
 
 **Skills**: `/sc:research`, `/sc:business-panel`
+
+---
+
+### CATEGORIA U — Browser Debugging con Chrome DevTools
+**Señales**: "inspecciona el navegador", "qué pasa en el browser", "errores de consola", "network tab", "fallos de red", "XHR/fetch falla", "DOM inspection", "performance del browser", "memory leak browser", "ve qué pasa en chrome", "devtools"
+
+> **⚡ EJECUCIÓN DIRECTA — PRIORIZAR `chrome-devtools` MCP**: Conecta directamente con Chrome DevTools Protocol para inspección en tiempo real sin screenshots.
+
+**MCPs que activar**:
+- `chrome-devtools` → PRINCIPAL — acceso directo a consola, red, DOM, performance, storage, coverage
+- `sequential-thinking` → para diagnóstico estructurado de problemas complejos
+- `context-mode` → correlacionar errores del browser con el código fuente local
+- `playwright` → si necesitas automatizar interacciones mientras inspeccionas
+
+**Capacidades del MCP `chrome-devtools`**:
+| Capacidad | Cuándo usarla |
+|-----------|---------------|
+| Console logs / errors | Capturar errores JS, warnings, stack traces en tiempo real |
+| Network inspector | Ver requests/responses fallidos, headers, payloads, CORS |
+| DOM inspector | Leer/modificar el DOM en vivo sin intervención manual |
+| Performance profiler | Detectar renders lentos, memory leaks, layout thrashing |
+| Storage inspector | Ver cookies, localStorage, sessionStorage, IndexedDB |
+| Coverage | Identificar CSS/JS no utilizado |
+| Source maps | Navegar hasta el archivo fuente exacto desde el error |
+
+**Flujo de diagnóstico con chrome-devtools**:
+```
+1. Conectar → abrir Chrome con --remote-debugging-port=9222
+2. chrome-devtools → capturar console errors + network failures
+3. sequential-thinking → analizar causa raíz con evidencia real
+4. context-mode → encontrar el archivo fuente responsable
+5. Aplicar fix → verificar en browser que desapareció el error
+```
+
+**Para tu proyecto Angular/Ionic (Zolvex)**:
+- Errores NG0100, NG02, NG04 → capturar stack trace completo del browser
+- Requests 404 al backend → inspeccionar Network tab para ver headers y payload exacto
+- Animaciones/CSS glitches → DOM inspector + computed styles en tiempo real
+- Change detection loops → Performance profiler para detectar renders excesivos
+
+**Squad de 10 agentes** (cuando el diagnóstico requiere múltiples dimensiones):
+
+| # | Dimensión | Agente |
+|---|-----------|--------|
+| 1 | Líder / Principal | `debugger` |
+| 2 | Soporte Técnico | `frontend-developer` |
+| 3 | Arquitecto | `architect-review` |
+| 4 | Calidad / QA | `devops-troubleshooter` |
+| 5 | Seguridad | `security-engineer` |
+| 6 | Testing / Integración | `accessibility-tester` |
+| 7 | Documentación | `documentation-engineer` |
+| 8 | Optimización | `performance-engineer` |
+| 9 | Refactoring | `error-detective` |
+| 10 | DevEx / Automatización | `devops-incident-responder` |
+
+**Skills**: `/sc:troubleshoot` + `chrome-devtools` MCP directo
 
 ---
 
