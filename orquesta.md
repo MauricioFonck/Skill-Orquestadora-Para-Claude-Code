@@ -329,7 +329,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 ---
 
 ### CATEGORIA H — Seguridad & Auditoría
-**Señales**: "seguridad", "vulnerabilidad", "pentest", "audit", "OWASP", "hack", "hardening", "compliance"
+**Señales**: "seguridad", "vulnerabilidad", "pentest", "audit", "OWASP", "hack", "hardening", "compliance", "multitenant", "tenant isolation", "aislamiento de tenants", "auditoría multi-tenant"
 
 **MCPs que activar**:
 - `sequential-thinking` → análisis metódico de superficie de ataque
@@ -337,7 +337,10 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 - `desktop-commander` → ejecutar herramientas de análisis
 - `context-mode` → búsqueda en codebase de patrones inseguros
 
-**Squad de 10 agentes**:
+**Skill prioritaria para auditorías profundas**:
+- **`multitenant-security-audit`** → auditoría completa de 12 fases (reconocimiento, aislamiento multi-tenant, autenticación, backend, base de datos, caché/colas, frontend, secretos, infraestructura, OWASP Top 10, logging/monitoreo, performance/DoS). Usar SIEMPRE que la petición implique auditar un proyecto SaaS multi-tenant completo, o cuando se mencione "audit", "pentest", "tenant isolation", "OWASP" o "hardening" sobre un proyecto real en el cwd. Produce findings con formato estándar: qué es → por qué es peligroso → cómo se explota → fix exacto → severidad. Cargar primero el `SKILL.md` y luego los archivos de `references/` por fase.
+
+**Squad de 10 agentes** (complementan a la skill para ejecutar los fixes y validar):
 
 | # | Dimensión | Agente |
 |---|-----------|--------|
@@ -352,7 +355,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | 9 | Refactoring | `security-engineer` |
 | 10 | DevEx / Automatización | `powershell-security-hardening` |
 
-**Skills**: `/sc:analyze` con foco en seguridad
+**Skills**: `multitenant-security-audit` (prioritaria para SaaS multi-tenant), `/sc:analyze` con foco en seguridad
 
 ---
 
