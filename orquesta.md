@@ -3,7 +3,7 @@ name: orquesta
 description: "Orquestador maestro que selecciona y combina automáticamente todos los MCPs, agentes y skills instalados para ejecutar cualquier tarea de software con máxima eficiencia y mínimo consumo de tokens"
 category: orchestration
 complexity: high
-mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, cisco-packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry, chrome-devtools]
+mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, cisco-packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry, chrome-devtools]
 tools: [gsd, superpowers, obsidian-vault, security-guard]
 personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 ---
@@ -581,9 +581,9 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
     GRUPO B — Dispositivos con IP estática (servidores, PCs fijos):
       → Identificados en FASE 2 PASO A/B con IP fija asignada.
       → No dependen del IOS engine → se envían en el mismo mensaje que los routers.
-        ⚠️ BUG CONOCIDO: configurePcIp() NO funciona en Server-PT — usar pt_configure_ip:
-        pt_configure_ip(device="Server1", ip="10.x.x.2", mask="255.x.x.x", gateway="10.x.x.1")
-        pt_configure_ip(device="Server0", ip="10.x.x.x", mask="255.x.x.x", gateway="10.x.x.x")
+        ⚠️ BUG CONOCIDO: configurePcIp() NO funciona en Server-PT — usar pt_configure_server_static o pt_configure_ip:
+        pt_configure_server_static(device="Server1", ip="10.x.x.2", mask="255.x.x.x", gateway="10.x.x.1")  ← preferida (IP + puede activar HTTP/DHCP pool)
+        pt_configure_ip(device="Server0", ip="10.x.x.x", mask="255.x.x.x", gateway="10.x.x.x")  ← alternativa (solo IP)
         Para PC-PT/Laptop-PT con IP estática SÍ se puede usar configurePcIp:
         pt_send_raw('configurePcIp("PC0", false, "10.x.x.x", "255.x.x.x", "10.x.x.x")')
       (todos los estáticos EN PARALELO con los routers)
@@ -614,10 +614,19 @@ MODO EXAMEN — Velocidad máxima bajo presión académica
 - `configurePcIp(name, dhcp)` o `configurePcIp(name, false, ip, mask, gw)` → IP de PC-PT y Laptop-PT SOLAMENTE
 - `addDevice / addLink` → solo para topología nueva
 
-**Tool MCP dedicada para end-devices:**
+**Tools MCP dedicadas para end-devices:**
 - `pt_configure_ip(device, dhcp, ip, mask, gateway, dns)` → funciona en TODOS los end-devices (PC-PT, Server-PT, Laptop-PT)
-  - Usar SIEMPRE para Server-PT (configurePcIp NO funciona en servidores)
+  - Usar para Server-PT cuando solo se necesita configurar la IP
   - Para PC-PT/Laptop-PT se puede usar cualquiera de las dos
+- `pt_configure_server_static(device, ip, mask, gateway, dns, http_enabled, dhcp_pool_start, dhcp_pool_end)` → **NUEVA** — especializada para Server-PT
+  - Usar cuando el servidor necesita IP + activar servicio HTTP o configurar pool DHCP
+  - Ejemplos: `pt_configure_server_static(device="Server0", ip="10.x.x.x", mask="255.x.x.x", gateway="10.x.x.1")`
+  - Con HTTP: `pt_configure_server_static(device="Server0", ip="10.x.x.x", http_enabled=True)`
+  - Con DHCP pool: `pt_configure_server_static(device="Server0", ip="...", dhcp_pool_start="...", dhcp_pool_end="...")`
+
+**Regla de decisión para Server-PT:**
+- Solo IP → usar `pt_configure_ip`
+- IP + HTTP o DHCP pool → usar `pt_configure_server_static`
 
 **Reglas clave:**
 - Siempre Router-PT y Switch 2960-24TT (pasar `router_model="Router-PT"` a pt_full_build)
