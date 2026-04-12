@@ -3,7 +3,7 @@ name: orquesta
 description: "Orquestador maestro que selecciona y combina automáticamente todos los MCPs, agentes y skills instalados para ejecutar cualquier tarea de software con máxima eficiencia y mínimo consumo de tokens"
 category: orchestration
 complexity: high
-mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, cisco-packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry, chrome-devtools]
+mcp-servers: [context7, sequential-thinking, filesystem, github, postgres, sqlite, mongodb, supabase, playwright, puppeteer, firecrawl, fetch, memory, desktop-commander, packet-tracer, context-mode, stitch, claude-flow, nanobanana, magic, sentry, chrome-devtools, code-review-graph]
 tools: [gsd, superpowers, obsidian-vault, security-guard]
 personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 ---
@@ -86,7 +86,7 @@ Agent tool call:
 Las skills (`/sc:implement`, `/sc:test`, etc.) las invoca Claude directamente o se delegan como instrucción dentro del `prompt` de un agente. No son Agent calls. No se mezclan en el mismo bloque de spawn.
 
 ### Cuándo Claude ejecuta SIN agentes
-- Categoría M (Redes/Cisco Packet Tracer) → usar MCP `packet-tracer` (global, 25 tools) o `cisco-packet-tracer` (local, 10 tools) directamente, sin Agent tool
+- Categoría M (Redes/Cisco Packet Tracer) → usar MCP `packet-tracer` directamente, sin Agent tool
 - Tareas de 1 sola acción MCP sin lógica compleja → Claude actúa solo
 - Cualquier otra categoría → Squad de 10 agentes en paralelo obligatorio
 
@@ -476,7 +476,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 
 ### CATEGORIA M — Redes & Cisco Packet Tracer
 
-> **⚡ EJECUCIÓN DIRECTA — SIN AGENTES**: Delega al skill `cisco-packet-tracer-orchestrator` que tiene el flujo completo. Usar MCP `packet-tracer` o `cisco-packet-tracer` directamente.
+> **⚡ EJECUCIÓN DIRECTA — SIN AGENTES**: Delega al skill `cisco-packet-tracer-orchestrator` que tiene el flujo completo. Usar MCP `packet-tracer` directamente.
 
 **Señales MODO NORMAL** (práctica libre, laboratorio, casa):
 - "topología", "red", "router", "switch", "cisco", "VLAN", "IP", "routing", "packet tracer", "simula red", "crea una topología", "construye red"
@@ -486,9 +486,10 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 - "analiza lo que armé", "ya armé la topología", "listo analiza"
 - "configura lo que ya está armado", "lee mi topología", "copia lo que hice"
 
-**MCPs disponibles**:
-- `packet-tracer` (global, 25 tools) → `pt_full_build`, `pt_live_deploy`, `pt_plan_topology`, etc.
-- `cisco-packet-tracer` (local, 10 tools) → `pt_send_cli`, `pt_configure_ip`, `pt_bridge_status`, etc.
+**MCP**: `packet-tracer` — ÚNICA herramienta necesaria.
+- **Ubicación**: `C:\Users\Andrea\Desktop\MCP-Packet-Tracer\`
+- **Versión**: v0.4.0 · 25 tools · `python -m packet_tracer_mcp --stdio`
+- **Repo**: `MauricioFonck/Mcp-Cisco-Paker-Tracer`
 
 **Defaults obligatorios**: Router = `Router-PT`, Switch = `2960-24TT`
 
@@ -1210,7 +1211,7 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 /orquesta Crea una topología con 2 routers, 3 switches y 6 PCs con VLANs
 ```
 **Decisión**: Categoría M (redes) → **delega a skill `cisco-packet-tracer.md`**
-**MCPs**: packet-tracer (25 tools, global) + cisco-packet-tracer (10 tools, local) + sequential-thinking
+**MCPs**: packet-tracer (25 tools, `C:\Users\Andrea\Desktop\MCP-Packet-Tracer`) + sequential-thinking
 **13 agentes en 4 sub-bloques**:
 - **COMMAND CENTER**: network-commander + document-analyzer + topology-planner
 - **EXECUTION**: network-engineer + network-support + network-architect + cli-specialist
@@ -1250,8 +1251,9 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 ## Inventario Completo de Herramientas Disponibles
 
 ### MCPs Activos (23)
-`packet-tracer` `cisco-packet-tracer` `stitch` `context7` `github` `postgres` `sqlite` `filesystem` `fetch` `memory` `sequential-thinking` `playwright` `firecrawl` `desktop-commander` `supabase` `mongodb` `puppeteer` `context-mode` `claude-flow` `nanobanana` `magic` `sentry`
+`packet-tracer` `code-review-graph` `stitch` `context7` `github` `postgres` `sqlite` `filesystem` `fetch` `memory` `sequential-thinking` `playwright` `firecrawl` `desktop-commander` `supabase` `mongodb` `puppeteer` `context-mode` `claude-flow` `nanobanana` `magic` `sentry`
 
+- **code-review-graph** → Grafo de conocimiento local del codebase. Reduce tokens 8x. Mapea funciones, clases, dependencias, blast-radius. 22 tools MCP. Instalado globalmente via `pip install code-review-graph`. Config en `~/.mcp.json`. Usar para: análisis de impacto de cambios, contexto de arquitectura, onboarding a nuevo proyecto, pre-merge checks. CLI: `code-review-graph build` (construir grafo) · `code-review-graph update` (actualización incremental) · `code-review-graph status` (estadísticas) · `code-review-graph serve` (servidor MCP). Slash commands: `/code-review-graph:build-graph` · `/code-review-graph:review-delta` · `/code-review-graph:review-pr`. **Zolvex**: 246 archivos, 1452 nodos, 6997 edges (TS + JS + Java + Bash), branch MainV2.
 - **sentry** → Monitoreo de errores en producción: issues activos, stack traces, eventos, performance, alertas — org `mauricio-org` en `https://mauricio-org.sentry.io` — instalado globalmente vía `@sentry/mcp-server`
 - **stitch** → Google Stitch: pipelines ETL cloud, ingesta de datos, sincronización hacia BigQuery/warehouses
 - **claude-flow** → 170+ herramientas swarm, SONA neural router (89% accuracy), AgentDB vector DB, 5 consensus protocols, 75% reducción de costos API
