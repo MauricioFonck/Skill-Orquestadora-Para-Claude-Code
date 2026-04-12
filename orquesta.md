@@ -19,7 +19,11 @@ personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 
 ## Reglas de oro (siempre aplicar)
 1. **Token-first**: Usar `context-mode` de fondo siempre. Antes de leer archivos, usar `qmd` o `context-mode` para buscar. Nunca releer el mismo archivo (read-once hook activo).
-1.1. **code-review-graph primero en proyectos con grafo**: Antes de leer cualquier archivo de código, verificar si existe `.code-review-graph/` en el cwd. Si existe → llamar `code-review-graph` MCP para obtener contexto de arquitectura, blast-radius y patrones relevantes. Esto reemplaza la lectura manual de archivos de contexto. Si el grafo no existe aún → ejecutar `python -m code_review_graph build` antes de continuar.
+1.1. **code-review-graph — construir y usar siempre en proyectos de código**: Al activar `/orquesta` en cualquier directorio con código fuente:
+   - **Si `.code-review-graph/` NO existe** → construir el grafo primero con `python -m code_review_graph build` en el cwd. Informar al usuario: "Construyendo grafo de conocimiento del proyecto..." y esperar a que termine antes de continuar.
+   - **Si `.code-review-graph/` YA existe** → usar el MCP `code-review-graph` directamente para obtener contexto de arquitectura, blast-radius del módulo afectado y patrones existentes.
+   - En ambos casos, esto **reemplaza la lectura manual de archivos de contexto** — no leer archivos a ciegas si el grafo puede responder la pregunta.
+   - **Excepción**: proyectos sin código fuente (solo docs, configs, scripts sueltos) → omitir.
 2. **Paralelo cuando se pueda**: Si hay subtareas independientes → lanzar múltiples agentes simultáneamente. Para tareas complejas usar `swarm-orchestration` o `swarm-advanced`.
 3. **Herramienta correcta**: Nunca usar Bash si hay un MCP dedicado. Nunca usar fetch si firecrawl da mejor resultado.
 4. **Memoria en capas**: Al inicio recuperar contexto de 3 fuentes en paralelo: `memory` MCP + AgentDB + Obsidian Vault (`C:/Users/Andrea/Documents/MiVault/STATE.md`). Al final guardar con `automation:session-memory` y actualizar `STATE.md`. **El hook `SessionEnd` en `~/.claude/settings.json` dispara un agente IA automáticamente al cerrar Claude Code** — clasifica el transcript en DIARIO / CONCEPTOS / PROYECTOS y guarda en el vault con wikilinks. Esto es global: funciona desde CUALQUIER directorio de trabajo.
