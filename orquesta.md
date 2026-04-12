@@ -19,6 +19,7 @@ personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 
 ## Reglas de oro (siempre aplicar)
 1. **Token-first**: Usar `context-mode` de fondo siempre. Antes de leer archivos, usar `qmd` o `context-mode` para buscar. Nunca releer el mismo archivo (read-once hook activo).
+1.1. **code-review-graph primero en proyectos con grafo**: Antes de leer cualquier archivo de código, verificar si existe `.code-review-graph/` en el cwd. Si existe → llamar `code-review-graph` MCP para obtener contexto de arquitectura, blast-radius y patrones relevantes. Esto reemplaza la lectura manual de archivos de contexto. Si el grafo no existe aún → ejecutar `python -m code_review_graph build` antes de continuar.
 2. **Paralelo cuando se pueda**: Si hay subtareas independientes → lanzar múltiples agentes simultáneamente. Para tareas complejas usar `swarm-orchestration` o `swarm-advanced`.
 3. **Herramienta correcta**: Nunca usar Bash si hay un MCP dedicado. Nunca usar fetch si firecrawl da mejor resultado.
 4. **Memoria en capas**: Al inicio recuperar contexto de 3 fuentes en paralelo: `memory` MCP + AgentDB + Obsidian Vault (`C:/Users/Andrea/Documents/MiVault/STATE.md`). Al final guardar con `automation:session-memory` y actualizar `STATE.md`. **El hook `SessionEnd` en `~/.claude/settings.json` dispara un agente IA automáticamente al cerrar Claude Code** — clasifica el transcript en DIARIO / CONCEPTOS / PROYECTOS y guarda en el vault con wikilinks. Esto es global: funciona desde CUALQUIER directorio de trabajo.
@@ -100,6 +101,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 **Señales**: "crea", "implementa", "desarrolla", "escribe código", "construye", "agrega feature"
 
 **MCPs que activar**:
+- `code-review-graph` → **PRIMERO** si existe `.code-review-graph/` en el proyecto: obtener contexto de arquitectura, blast-radius del módulo afectado y patrones existentes. Evita leer archivos innecesarios.
 - `context7` → documentación actualizada del framework detectado
 - `filesystem` → leer estructura del proyecto existente
 - `context-mode` → indexación automática para búsqueda eficiente
@@ -188,6 +190,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 **Señales**: "error", "bug", "no funciona", "falla", "exception", "crash", "arregla"
 
 **MCPs que activar**:
+- `code-review-graph` → **PRIMERO** si existe `.code-review-graph/`: localizar el módulo afectado, ver qué archivos lo importan (blast-radius) y qué cambió recientemente. Reduce búsqueda manual de archivos.
 - `sequential-thinking` → razonamiento paso a paso sobre la causa raíz
 - `desktop-commander` → ejecutar el código y capturar el error real
 - `filesystem` → leer archivos relevantes al error
@@ -363,6 +366,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 **Señales**: "revisa", "refactoriza", "mejora", "optimiza código", "limpia", "code review", "technical debt"
 
 **MCPs que activar**:
+- `code-review-graph` → **PRIMERO** si existe `.code-review-graph/`: mapa completo del módulo, dependencias, comunidades de código relacionadas. Base para decidir qué refactorizar sin romper nada.
 - `context-mode` → indexar y buscar patrones en codebase
 - `sequential-thinking` → para refactors complejos
 - `filesystem` → leer código a revisar
