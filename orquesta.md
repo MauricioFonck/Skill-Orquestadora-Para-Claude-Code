@@ -17,14 +17,50 @@ personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 /orquesta [descripción de lo que quieres hacer]
 ```
 
+---
+
+## ⚠️ PASO CERO — OBLIGATORIO ANTES DE CUALQUIER ACCIÓN
+
+> **ESTE PASO NO ES OPCIONAL. NO SE PUEDE OMITIR. NO IMPORTA QUÉ TAN SIMPLE SEA LA TAREA.**
+> Saltarlo es una violación del protocolo. Si lo saltaste, detente y ejecútalo ahora.
+
+Al recibir cualquier petición en un directorio con código fuente:
+
+### 1. Verificar si `.code-review-graph/` existe en el cwd
+```bash
+ls .code-review-graph/ 2>/dev/null && echo "GRAFO_EXISTE" || echo "GRAFO_AUSENTE"
+```
+
+### 2a. Si GRAFO_EXISTE → usar MCP `code-review-graph` PRIMERO (antes de Glob, Grep o Read)
+Ejecutar en paralelo las siguientes consultas MCP:
+- `get_review_context` → contexto de arquitectura del módulo afectado
+- `get_impact_radius` → blast-radius: qué archivos importan el módulo
+- `get_architecture_overview` → mapa general del proyecto
+
+**Esto reemplaza completamente la lectura manual de archivos de contexto.**
+No usar Glob/Grep/Read para entender el proyecto si el grafo puede responder la pregunta.
+
+### 2b. Si GRAFO_AUSENTE → construir el grafo PRIMERO
+```bash
+python -m code_review_graph build
+```
+Informar: "Construyendo grafo de conocimiento del proyecto..." y esperar antes de continuar.
+
+### Única excepción válida
+Proyectos sin código fuente (solo docs, configs sueltos, scripts de 1 archivo) → omitir.
+**En proyectos mixtos o con cualquier archivo `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb` → NUNCA omitir.**
+
+### 3. Al finalizar — sincronizar el grafo (en background)
+Después de crear, editar o eliminar cualquier archivo de código:
+```bash
+python -m code_review_graph update
+```
+Ejecutar en background sin interrumpir al usuario.
+
+---
+
 ## Reglas de oro (siempre aplicar)
 1. **Token-first**: Usar `context-mode` de fondo siempre. Antes de leer archivos, usar `qmd` o `context-mode` para buscar. Nunca releer el mismo archivo (read-once hook activo).
-1.1. **code-review-graph — construir y usar siempre en proyectos de código**: Al activar `/orquesta` en cualquier directorio con código fuente:
-   - **Si `.code-review-graph/` NO existe** → construir el grafo primero con `python -m code_review_graph build` en el cwd. Informar al usuario: "Construyendo grafo de conocimiento del proyecto..." y esperar a que termine antes de continuar.
-   - **Si `.code-review-graph/` YA existe** → usar el MCP `code-review-graph` directamente para obtener contexto de arquitectura, blast-radius del módulo afectado y patrones existentes.
-   - En ambos casos, esto **reemplaza la lectura manual de archivos de contexto** — no leer archivos a ciegas si el grafo puede responder la pregunta.
-   - **Excepción**: proyectos sin código fuente (solo docs, configs, scripts sueltos) → omitir.
-   - **Al finalizar cualquier tarea que modifique archivos de código** → ejecutar `python -m code_review_graph update` en el cwd para mantener el grafo sincronizado. Siempre después de crear, editar o eliminar archivos `.ts`, `.js`, `.py`, `.java`, `.go`, `.rs`, `.cs`, `.php`, `.rb`, etc. Hacerlo en segundo plano sin interrumpir al usuario.
 2. **Paralelo cuando se pueda**: Si hay subtareas independientes → lanzar múltiples agentes simultáneamente. Para tareas complejas usar `swarm-orchestration` o `swarm-advanced`.
 3. **Herramienta correcta**: Nunca usar Bash si hay un MCP dedicado. Nunca usar fetch si firecrawl da mejor resultado.
 4. **Memoria en capas**: Al inicio recuperar contexto de 3 fuentes en paralelo: `memory` MCP + AgentDB + Obsidian Vault (`C:/Users/Andrea/Documents/MiVault/STATE.md`). Al final guardar con `automation:session-memory` y actualizar `STATE.md`. **El hook `SessionEnd` en `~/.claude/settings.json` dispara un agente IA automáticamente al cerrar Claude Code** — clasifica el transcript en DIARIO / CONCEPTOS / PROYECTOS y guarda en el vault con wikilinks. Esto es global: funciona desde CUALQUIER directorio de trabajo.
