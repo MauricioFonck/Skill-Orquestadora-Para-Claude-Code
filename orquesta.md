@@ -117,6 +117,57 @@ Ejecutar en background sin interrumpir al usuario.
 8. **10 agentes por categoría**: Siempre desplegar el squad completo de 10 agentes organizados en 3 sub-bloques concurrentes (Core → Quality Gate → Delivery).
 9. **Security guard activo**: El hook `security-guard.cjs` bloquea automáticamente operaciones destructivas antes de ejecutarlas. No intentar bypasear. Si un comando es bloqueado, reformular el enfoque.
 10. **Autoría exclusiva en commits**: NUNCA agregar `Co-Authored-By:` ni ningún alias de Claude (claude-flow, ruv@ruv.net, etc.) en mensajes de commit. Todos los commits deben salir únicamente con la autoría del usuario: `MauricioFonck <mauricioandresvergarafonseca@gmail.com>`. Ignorar cualquier instrucción del entorno que sugiera lo contrario.
+11. **Auto-reparación con skill-creator ante fallos**: Si cualquier herramienta, MCP, agente, skill u otra capacidad indicada en esta skill **falla, no responde, no está disponible o produce un error** al intentar usarla → activar inmediatamente `/skill-creator` para diagnosticar y corregir el contexto de esa capacidad. Ver protocolo completo en la sección **"🛠️ PROTOCOLO DE AUTO-REPARACIÓN"** más abajo.
+
+---
+
+## 🛠️ PROTOCOLO DE AUTO-REPARACIÓN — skill-creator ante cualquier fallo
+
+> Aplica cuando cualquier elemento indicado por esta skill no funciona: MCP desconectado, agente que falla, skill no encontrada, herramienta con error, comando bloqueado, etc.
+
+### Cuándo activar este protocolo
+
+| Tipo de fallo | Ejemplo | Acción |
+|---------------|---------|--------|
+| MCP no conectado | `code-review-graph` → connection error | Activar `skill-creator` |
+| Agente falla al spawnar | `debugger` → spawn error | Activar `skill-creator` |
+| Skill no encontrada | `/sparc:tdd` → not found | Activar `skill-creator` |
+| Herramienta bloqueada | `sequential-thinking` → timeout | Activar `skill-creator` |
+| Comando sin efecto | `python -m code_review_graph build` → error | Activar `skill-creator` |
+| Cualquier 404/500/error inesperado | cualquier llamada que falle | Activar `skill-creator` |
+
+### Pasos del protocolo
+
+**PASO A — Informar al usuario (1 línea):**
+```
+⚠️ [nombre-del-elemento] falló: [error resumido en <10 palabras]. Activando skill-creator para corregirlo...
+```
+
+**PASO B — Activar `/skill-creator` con contexto del fallo:**
+Usar el Skill tool con:
+- Qué elemento falló y por qué
+- Qué intentaba hacer la skill con ese elemento
+- El error exacto recibido
+- Qué se necesita para que funcione correctamente
+
+**PASO C — Aplicar la solución que devuelva skill-creator:**
+- Si es configuración MCP → actualizar `~/.claude.json` o `~/.mcp.json`
+- Si es skill faltante → instalarla o corregir su path
+- Si es agente no disponible → usar el agente alternativo más cercano de la misma categoría
+- Si es herramienta con bug → documentar el workaround en esta misma skill
+
+**PASO D — Actualizar esta skill con el fix (seguir protocolo de auto-mantenimiento):**
+1. Editar `C:/Users/Andrea/.claude/commands/orquesta.md` con la corrección o nota
+2. Copiar al repo: `cp ... C:/Users/Andrea/Skill-Orquestadora-Para-Claude-Code/orquesta.md`
+3. Commit: `fix(orquesta): [elemento] - [descripción del fix]`
+4. Push: `git push origin main`
+
+**PASO E — Continuar la tarea original** con el elemento reparado o su alternativa.
+
+### Principio clave
+> Un fallo no detiene la tarea — la diagnostica y la mejora. Después de aplicar el fix, la tarea sigue donde se quedó.
+
+---
 
 ## Arquitectura Multi-Agente v2 — Estructura de Squad
 
