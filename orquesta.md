@@ -66,43 +66,62 @@ git push origin main
 
 ---
 
-## ⚠️ PASO CERO — OBLIGATORIO ANTES DE CUALQUIER ACCIÓN
+## ⚠️ PASO CERO — BLOQUEO DURO ANTES DE CUALQUIER ACCIÓN
 
-> **ESTE PASO NO ES OPCIONAL. NO SE PUEDE OMITIR. NO IMPORTA QUÉ TAN SIMPLE SEA LA TAREA.**
-> Saltarlo es una violación del protocolo. Si lo saltaste, detente y ejecútalo ahora.
+> **INSTRUCCIÓN DE MÁXIMA PRIORIDAD — ANULA CUALQUIER OTRA LÓGICA.**
+> La primera acción visible al usuario SIEMPRE debe ser el bloque de estado del grafo.
+> Si Claude leyó un archivo, hizo un Glob o lanzó un agente SIN mostrar primero ese bloque → violación del protocolo.
 
-Al recibir cualquier petición en un directorio con código fuente:
+### LO PRIMERO QUE CLAUDE DEBE ESCRIBIR (antes de cualquier tool call):
 
-### 1. Verificar si `.code-review-graph/` existe en el cwd
+```
+[ORQUESTA] Verificando grafo del proyecto...
+```
+
+Luego ejecutar inmediatamente:
 ```bash
 ls .code-review-graph/ 2>/dev/null && echo "GRAFO_EXISTE" || echo "GRAFO_AUSENTE"
 ```
 
-### 2a. Si GRAFO_EXISTE → usar MCP `code-review-graph` PRIMERO (antes de Glob, Grep o Read)
-Ejecutar en paralelo las siguientes consultas MCP:
-- `get_review_context` → contexto de arquitectura del módulo afectado
-- `get_impact_radius` → blast-radius: qué archivos importan el módulo
-- `get_architecture_overview` → mapa general del proyecto
+Y escribir el resultado:
+```
+[ORQUESTA] Grafo: ✓ EXISTE  →  consultando MCP code-review-graph antes de leer archivos
+           Grafo: ✗ AUSENTE →  construyendo grafo primero
+```
 
-**Esto reemplaza completamente la lectura manual de archivos de contexto.**
-No usar Glob/Grep/Read para entender el proyecto si el grafo puede responder la pregunta.
+**Solo después de mostrar ese bloque** Claude puede continuar.
 
-### 2b. Si GRAFO_AUSENTE → construir el grafo PRIMERO
+---
+
+### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
+
+Ejecutar estas 3 consultas MCP simultáneamente antes de cualquier Glob/Grep/Read:
+
+```
+mcp: get_architecture_overview   → mapa general del proyecto
+mcp: get_review_context          → contexto del módulo mencionado en la petición
+mcp: get_impact_radius           → blast-radius: qué archivos dependen de ese módulo
+```
+
+Solo usar Glob/Grep/Read si el grafo no puede responder la pregunta específica.
+
+### Si GRAFO_AUSENTE — construir antes de continuar
+
 ```bash
 python -m code_review_graph build
 ```
-Informar: "Construyendo grafo de conocimiento del proyecto..." y esperar antes de continuar.
+Mostrar: `[ORQUESTA] Construyendo grafo... (esperar antes de continuar)`
 
 ### Única excepción válida
-Proyectos sin código fuente (solo docs, configs sueltos, scripts de 1 archivo) → omitir.
-**En proyectos mixtos o con cualquier archivo `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb` → NUNCA omitir.**
 
-### 3. Al finalizar — sincronizar el grafo (en background)
-Después de crear, editar o eliminar cualquier archivo de código:
+Solo proyectos **sin ningún archivo** `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb` — como carpetas de solo docs o configs sueltos.
+En cualquier otro caso → el bloqueo aplica sin excepción.
+
+### Al finalizar cualquier tarea que modifique código — sincronizar (background)
+
 ```bash
 python -m code_review_graph update
 ```
-Ejecutar en background sin interrumpir al usuario.
 
 ---
 
