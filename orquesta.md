@@ -68,28 +68,53 @@ git push origin main
 
 ## ⚠️ PASO CERO — BLOQUEO DURO ANTES DE CUALQUIER ACCIÓN
 
-> **INSTRUCCIÓN DE MÁXIMA PRIORIDAD — ANULA CUALQUIER OTRA LÓGICA.**
-> La primera acción visible al usuario SIEMPRE debe ser el bloque de estado del grafo.
-> Si Claude leyó un archivo, hizo un Glob o lanzó un agente SIN mostrar primero ese bloque → violación del protocolo.
+> **ESTE PASO ESTÁ RESPALDADO POR UN HOOK AUTOMÁTICO.**
+> El script `C:/Users/Andrea/.claude/helpers/orquesta-graph-check.cjs` se ejecuta
+> en cada `UserPromptSubmit` que contenga "orquesta" e inyecta el estado del grafo
+> como contexto ANTES de que Claude procese el mensaje.
+> Claude debe respetar ese contexto inyectado y mostrar el resultado al usuario.
 
 ### LO PRIMERO QUE CLAUDE DEBE ESCRIBIR (antes de cualquier tool call):
 
 ```
-[ORQUESTA] Verificando grafo del proyecto...
-```
-
-Luego ejecutar inmediatamente:
-```bash
-ls .code-review-graph/ 2>/dev/null && echo "GRAFO_EXISTE" || echo "GRAFO_AUSENTE"
-```
-
-Y escribir el resultado:
-```
 [ORQUESTA] Grafo: ✓ EXISTE  →  consultando MCP code-review-graph antes de leer archivos
-           Grafo: ✗ AUSENTE →  construyendo grafo primero
+```
+o
+```
+[ORQUESTA] Grafo: ✗ AUSENTE →  construyendo grafo primero con python -m code_review_graph build
 ```
 
-**Solo después de mostrar ese bloque** Claude puede continuar.
+**El hook ya verificó el estado — Claude solo debe mostrarlo y actuar en consecuencia.**
+Si el hook inyectó `✓ EXISTE` → consultar MCP. Si inyectó `✗ AUSENTE` → construir primero.
+
+### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
+
+Ejecutar estas 3 consultas MCP simultáneamente antes de cualquier Glob/Grep/Read:
+
+```
+mcp: get_architecture_overview   → mapa general del proyecto
+mcp: get_review_context          → contexto del módulo mencionado en la petición
+mcp: get_impact_radius           → blast-radius: qué archivos dependen de ese módulo
+```
+
+Solo usar Glob/Grep/Read si el grafo no puede responder la pregunta específica.
+
+### Si GRAFO_AUSENTE — construir antes de continuar
+
+```bash
+python -m code_review_graph build
+```
+
+### Única excepción válida
+
+Solo proyectos **sin ningún archivo** `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb`.
+En cualquier otro caso → el bloqueo aplica sin excepción.
+
+### Al finalizar cualquier tarea que modifique código — sincronizar (background)
+
+```bash
+python -m code_review_graph update
+```
 
 ---
 
