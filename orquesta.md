@@ -116,6 +116,8 @@ En cualquier otro caso → el bloqueo aplica sin excepción.
 python -m code_review_graph update
 ```
 
+> ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH (fix aplicado 2026-04-13).
+
 ---
 
 ### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
@@ -147,6 +149,8 @@ En cualquier otro caso → el bloqueo aplica sin excepción.
 ```bash
 python -m code_review_graph update
 ```
+
+> ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH (fix aplicado 2026-04-13).
 
 ---
 
