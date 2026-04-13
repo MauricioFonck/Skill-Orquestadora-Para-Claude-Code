@@ -19,6 +19,53 @@ personas: [workflow-orchestrator, multi-agent-coordinator, task-distributor]
 
 ---
 
+## 🔄 AUTO-MANTENIMIENTO DE ESTA SKILL — LEER ANTES DE MODIFICARLA
+
+> Esta skill vive en **dos lugares sincronizados**. Cada modificación DEBE aplicarse en ambos y luego subirse a GitHub. Si solo editas uno, quedan desincronizados.
+
+### Ubicaciones de la skill
+
+| Copia | Ruta | Para qué sirve |
+|-------|------|----------------|
+| **Activa** (Claude la lee) | `C:/Users/Andrea/.claude/commands/orquesta.md` | La que Claude ejecuta en cada sesión |
+| **Repo GitHub** | `C:/Users/Andrea/Skill-Orquestadora-Para-Claude-Code/orquesta.md` | Historial de versiones + backup público |
+| **GitHub remoto** | `https://github.com/MauricioFonck/Skill-Orquestadora-Para-Claude-Code` | Repo público en GitHub |
+
+### Protocolo obligatorio al modificar esta skill
+
+Cuando el usuario pide modificar `/orquesta`, ejecutar estos pasos **en orden**:
+
+**PASO 1 — Editar la copia activa:**
+```
+Edit: C:/Users/Andrea/.claude/commands/orquesta.md
+```
+
+**PASO 2 — Sincronizar al repo GitHub:**
+```bash
+cp "C:/Users/Andrea/.claude/commands/orquesta.md" "C:/Users/Andrea/Skill-Orquestadora-Para-Claude-Code/orquesta.md"
+```
+
+**PASO 3 — Commit y push (NUNCA con Co-Authored-By):**
+```bash
+cd "C:/Users/Andrea/Skill-Orquestadora-Para-Claude-Code"
+git add orquesta.md
+git commit -m "feat(orquesta): [descripción del cambio]"
+git push origin main
+```
+
+**PASO 4 — Confirmar al usuario:**
+```
+✓ skill activa actualizada
+✓ repo GitHub sincronizado → commit [hash] en MauricioFonck/Skill-Orquestadora-Para-Claude-Code
+```
+
+### Reglas de commit para esta skill
+- Prefijo: `feat(orquesta):` para nuevas funciones · `fix(orquesta):` para correcciones · `refactor(orquesta):` para restructuras
+- NUNCA agregar `Co-Authored-By:` — solo autoría de `MauricioFonck`
+- Mensaje en inglés, descriptivo del cambio real
+
+---
+
 ## ⚠️ PASO CERO — OBLIGATORIO ANTES DE CUALQUIER ACCIÓN
 
 > **ESTE PASO NO ES OPCIONAL. NO SE PUEDE OMITIR. NO IMPORTA QUÉ TAN SIMPLE SEA LA TAREA.**
