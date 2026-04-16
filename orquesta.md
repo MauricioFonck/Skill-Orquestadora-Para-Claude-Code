@@ -66,7 +66,7 @@ git push origin main
 
 ---
 
-## ⚠️ PASO CERO — BLOQUEO DURO ANTES DE CUALQUIER ACCIÓN
+## ⚠️ PASO CERO — VERIFICAR ESTADO DEL GRAFO
 
 > **ESTE PASO ESTÁ RESPALDADO POR UN HOOK AUTOMÁTICO.**
 > El script `C:/Users/Andrea/.claude/helpers/orquesta-graph-check.cjs` se ejecuta
@@ -83,42 +83,6 @@ o
 ```
 [ORQUESTA] Grafo: ✗ AUSENTE →  construyendo grafo primero con python -m code_review_graph build
 ```
-
-**El hook ya verificó el estado — Claude solo debe mostrarlo y actuar en consecuencia.**
-Si el hook inyectó `✓ EXISTE` → consultar MCP. Si inyectó `✗ AUSENTE` → construir primero.
-
-### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
-
-Ejecutar estas 3 consultas MCP simultáneamente antes de cualquier Glob/Grep/Read:
-
-```
-mcp: get_architecture_overview   → mapa general del proyecto
-mcp: get_review_context          → contexto del módulo mencionado en la petición
-mcp: get_impact_radius           → blast-radius: qué archivos dependen de ese módulo
-```
-
-Solo usar Glob/Grep/Read si el grafo no puede responder la pregunta específica.
-
-### Si GRAFO_AUSENTE — construir antes de continuar
-
-```bash
-python -m code_review_graph build
-```
-
-### Única excepción válida
-
-Solo proyectos **sin ningún archivo** `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb`.
-En cualquier otro caso → el bloqueo aplica sin excepción.
-
-### Al finalizar cualquier tarea que modifique código — sincronizar (background)
-
-```bash
-python -m code_review_graph update
-```
-
-> ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH (fix aplicado 2026-04-13).
-
----
 
 ### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
 
@@ -144,13 +108,36 @@ Mostrar: `[ORQUESTA] Construyendo grafo... (esperar antes de continuar)`
 Solo proyectos **sin ningún archivo** `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb` — como carpetas de solo docs o configs sueltos.
 En cualquier otro caso → el bloqueo aplica sin excepción.
 
-### Al finalizar cualquier tarea que modifique código — sincronizar (background)
+> ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH.
 
-```bash
-python -m code_review_graph update
+---
+
+## 🎛️ CONTROL MANUAL DEL GRAFO — El usuario decide cuándo
+
+> El grafo **no se actualiza automáticamente**. El usuario lo controla explícitamente con frases naturales. Claude debe reconocer estas intenciones y ejecutar el comando correspondiente sin pedir confirmación.
+
+### Comandos por intención del usuario
+
+| El usuario dice... | Claude ejecuta |
+|--------------------|----------------|
+| `"actualiza el grafo"` / `"sincroniza el grafo"` / `"rebuild graph"` | `python -m code_review_graph update` |
+| `"lee el grafo"` / `"qué dice el grafo"` / `"muéstrame la arquitectura"` | MCP `get_architecture_overview` |
+| `"analiza este módulo [X]"` / `"qué impacta [X]"` | MCP `get_review_context` + `get_impact_radius` en paralelo |
+| `"construye el grafo"` / `"indexa el proyecto"` / `"build graph"` | `python -m code_review_graph build` |
+| `"estado del grafo"` / `"está listo el grafo?"` | `python -m code_review_graph status` |
+
+### Cuándo recomendar al usuario actualizar el grafo
+
+Claude debe **sugerir** (no forzar) actualizar el grafo después de:
+- Sesiones con más de 5 archivos modificados
+- Refactorizaciones que movieron o renombraron módulos
+- Instalación de nuevas dependencias
+
+Forma correcta de sugerirlo:
 ```
-
-> ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH (fix aplicado 2026-04-13).
+[ORQUESTA] Se modificaron 7 archivos en esta sesión.
+Sugerencia: "actualiza el grafo" para que el índice refleje los cambios.
+```
 
 ---
 
