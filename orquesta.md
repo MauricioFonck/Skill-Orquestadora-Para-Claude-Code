@@ -66,25 +66,39 @@ git push origin main
 
 ---
 
-## ⚠️ PASO CERO — VERIFICAR ESTADO DEL GRAFO
+## ⚠️ PASO CERO — DETECTAR TIPO DE PROYECTO Y ESTADO DEL GRAFO
 
-> **ESTE PASO ESTÁ RESPALDADO POR UN HOOK AUTOMÁTICO.**
-> El script `C:/Users/Andrea/.claude/helpers/orquesta-graph-check.cjs` se ejecuta
-> en cada `UserPromptSubmit` que contenga "orquesta" e inyecta el estado del grafo
-> como contexto ANTES de que Claude procese el mensaje.
-> Claude debe respetar ese contexto inyectado y mostrar el resultado al usuario.
+> `/orquesta` es exclusivamente para **proyectos de código**. Antes de cualquier acción, Claude debe detectar si el directorio actual es un proyecto de código y si el grafo existe. **No gastar tokens en análisis innecesarios.**
 
-### LO PRIMERO QUE CLAUDE DEBE ESCRIBIR (antes de cualquier tool call):
+### ÁRBOL DE DECISIÓN — ejecutar en orden, detenerse en el primer match
+
+**1. ¿Es un proyecto de código?**
+
+Verificar si existe al menos un archivo con extensión `.ts .js .py .java .go .rs .cs .php .rb .tsx .jsx .vue .swift .kt .cpp .c`.
 
 ```
-[ORQUESTA] Grafo: ✓ EXISTE  →  consultando MCP code-review-graph antes de leer archivos
-```
-o
-```
-[ORQUESTA] Grafo: ✗ AUSENTE →  construyendo grafo primero con python -m code_review_graph build
+NO hay archivos de código → responder:
+"[ORQUESTA] Este directorio no contiene código fuente. /orquesta es para proyectos de código."
+STOP — no continuar, no gastar más tokens.
 ```
 
-### Si GRAFO_EXISTE — consultar MCP en paralelo (NO leer archivos aún)
+**2. ¿Existe el grafo (`.code-review-graph/`)?**
+
+El hook `orquesta-graph-check.cjs` ya inyectó el estado. Leer ese contexto.
+
+```
+GRAFO ✓ EXISTE → ir al paso 3
+GRAFO ✗ AUSENTE → preguntar al usuario (NO construir automáticamente):
+
+"[ORQUESTA] Este proyecto no tiene grafo de código indexado.
+ ¿Quieres que lo construya ahora? (tarda ~1-2 min según tamaño del proyecto)
+ → Responde 'sí' para indexar o 'no' para continuar sin grafo."
+
+Esperar respuesta. Si dice sí → python -m code_review_graph build
+                  Si dice no → continuar con Glob/Grep/Read normalmente
+```
+
+**3. GRAFO EXISTE — consultar MCP en paralelo (NO leer archivos aún)**
 
 Ejecutar estas 3 consultas MCP simultáneamente antes de cualquier Glob/Grep/Read:
 
@@ -95,18 +109,6 @@ mcp: get_impact_radius           → blast-radius: qué archivos dependen de ese
 ```
 
 Solo usar Glob/Grep/Read si el grafo no puede responder la pregunta específica.
-
-### Si GRAFO_AUSENTE — construir antes de continuar
-
-```bash
-python -m code_review_graph build
-```
-Mostrar: `[ORQUESTA] Construyendo grafo... (esperar antes de continuar)`
-
-### Única excepción válida
-
-Solo proyectos **sin ningún archivo** `.ts/.js/.py/.java/.go/.rs/.cs/.php/.rb` — como carpetas de solo docs o configs sueltos.
-En cualquier otro caso → el bloqueo aplica sin excepción.
 
 > ⚠️ **Fix conocido**: Usar siempre `python -m code_review_graph` — en Windows el alias `code-review-graph` no existe en PATH.
 
