@@ -655,167 +655,13 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 
 ### CATEGORIA M — Redes & Cisco Packet Tracer
 
-> **⚡ EJECUCIÓN DIRECTA — SIN AGENTES**: Delega al skill `cisco-packet-tracer-orchestrator` que tiene el flujo completo. Usar MCP `packet-tracer` directamente.
+> **⚡ EJECUCIÓN DIRECTA — SIN AGENTES**: Invocar skill `/cisco-pt` — autosuficiente, contiene todo el flujo.
 
-**Señales MODO NORMAL** (práctica libre, laboratorio, casa):
-- "topología", "red", "router", "switch", "cisco", "VLAN", "IP", "routing", "packet tracer", "simula red", "crea una topología", "construye red"
+**Señales MODO NORMAL**: "topología", "red", "router", "switch", "cisco", "VLAN", "IP", "routing", "packet tracer", "simula red", "crea una topología", "construye red"
 
-**Señales MODO EXAMEN** (parcial, examen, taller calificado):
-- "modo examen", "estoy en examen", "parcial en clase"
-- "analiza lo que armé", "ya armé la topología", "listo analiza"
-- "configura lo que ya está armado", "lee mi topología", "copia lo que hice"
+**Señales MODO EXAMEN**: "modo examen", "estoy en examen", "parcial en clase", "analiza lo que armé", "ya armé la topología", "listo analiza", "configura lo que ya está armado"
 
-**MCP**: `packet-tracer` — ÚNICA herramienta necesaria.
-- **Ubicación**: `C:\Users\Andrea\Desktop\MCP-Packet-Tracer\`
-- **Versión**: v0.4.0 · 25 tools · `python -m packet_tracer_mcp --stdio`
-- **Repo**: `MauricioFonck/Mcp-Cisco-Paker-Tracer`
-
-**Defaults obligatorios**: Router = `Router-PT`, Switch = `2960-24TT`
-
-**Dos modos con flujos técnicos diferenciados:**
-
-```
-MODO NORMAL — Con tiempo disponible
-
-  A) Topología nueva desde cero:
-    → Recopilar requisitos del usuario (routers, PCs, routing, DHCP, NAT...)
-    → pt_full_build(routers=N, pcs_per_lan=N, routing="...", router_model="Router-PT", deploy=true)
-    → Si necesita NAT/ACL (no soportados por generador):
-      → pt_send_raw('configureIosDevice("RouterX", "...comandos NAT...")')
-
-  B) Configuración de topología existente (sin prisa):
-    → pt_query_topology() → escanear dispositivos
-    → Mostrar lo encontrado, preguntar qué configurar
-    → [INTERPRETAR Y VALIDAR — ver protocolo abajo]
-    → Armar bloque CLI por router (incluyendo NAT, helper-address, etc.)
-    → pt_send_raw('configureIosDevice("RouterX", "enable\nconfigure terminal\n...")')
-    → Para PC-PT/Laptop-PT: pt_send_raw('configurePcIp("PC0", true)')
-    → Para Server-PT: pt_configure_ip(device="Server0", dhcp=True) ⚠️ configurePcIp NO funciona en Server-PT
-    → Explicar lo hecho, sugerir verificaciones
-
-MODO EXAMEN — Velocidad máxima bajo presión académica
-
-  Contexto: solo PT + CMD abiertas, profesor vigila, tiempo límite.
-  El usuario armó la topología manualmente y dicta las configs del tablero/hoja.
-
-  ⚠️ NUNCA pt_full_build ni pt_live_deploy (crearían duplicados).
-  ⚠️ Cero texto innecesario. Solo acción y confirmación breve.
-  ⚠️ Preguntar ANTES de ejecutar. Mejor preguntar 3 veces que equivocarse.
-  ⚠️ NUNCA mezclar configuración de routers y activación DHCP en el mismo paso.
-
-  FLUJO (4 fases):
-
-  FASE 1 — ESCANEO:
-    pt_query_topology() → obtener nombres y modelos reales.
-    ESCANEO DE ENLACES via pt_send_raw (NO usar pt_query_links — da timeout):
-      pt_send_raw(js_code="var n=ipc.network();var dc=n.getDeviceCount();var linksMap={};for(var i=0;i<dc;i++){var d=n.getDeviceAt(i);if(!d)continue;var dn=d.getName();var pc=d.getPortCount();for(var j=0;j<pc;j++){var p=d.getPortAt(j);if(p&&p.getLink()){var uuid=p.getLink().getObjectUuid();var entry=dn+'['+p.getName()+']';if(!linksMap[uuid]){linksMap[uuid]=entry;}else{linksMap[uuid]=linksMap[uuid]+'<--->'+entry;}}}}var results=[];for(var k in linksMap){results.push(linksMap[k]);}reportResult(results.length>0?results.join('|'):'sin_enlaces');", wait_result=True)
-    Parsear resultado (separador "|") → mapa físico completo.
-    Mostrar: "Detecté: [dispositivos] con [N] enlaces."
-
-  FASE 2 — INTERPRETAR Y VALIDAR (UN solo mensaje):
-    El usuario dicta la config del tablero/hoja. Puede ser caótica, mal redactada,
-    con IPs sueltas, sin orden, o mezclar datos correctos con errores tipográficos.
-    Claude NUNCA asume que falta algo sin antes EXTRAER todo lo que hay.
-
-    PATRONES RECONOCIDOS (clasificar durante extracción):
-    • "DATO IMPORTANTE:" / "DATO SUPER IMPORTANTE:" / "CORRECCIÓN:" → prioridad máxima.
-    • Tabla VLSM (subred base + host counts) → calcular tabla ANTES de asignar IPs.
-    • DHCP multi-fuente ("PC0→DHCP del Servidor0", "Laptop→DHCP del Switch1") → {dev→fuente}.
-    • VLANs con rangos de puertos → mapear puertos y fuente DHCP por cada VLAN.
-    • NAT global ("RouterX debe brindar NAT") → inside/outside + ruta default en todos.
-    • IP estática mezclada con DHCP → distinguir explícitamente en el plan.
-    • Inconsistencia header/cuerpo (header dice R0, link dice R1) → flagear [CONFLICTO].
-
-    PASO A — EXTRAER (siempre primero):
-      Leer el input completo del usuario y clasificar cada dato en los patrones anteriores.
-      Si hay tabla VLSM → calcularla primero (mayor a menor host count).
-      No juzgar, no completar todavía.
-      Anotar toda inconsistencia o [CONFLICTO] antes de continuar.
-
-    PASO B — COMPLETAR (solo lo verdaderamente ausente):
-      Solo para datos que NO aparecen en ninguna forma en el input:
-       IPs no dadas → usar subredes VLSM si las calculaste; si no: 192.168.X.0/24 LANs, 10.0.X.X/30 WAN
-       DNS → 8.8.8.8 | Clock rate → 64000 seriales | DHCP no mencionado → asumir SÍ
-       Routing no especificado → PREGUNTAR, no asumir
-      ⚠️ Si el dato está presente aunque mal escrito → NO completar con default,
-         corregirlo y marcarlo como "[corregido]".
-
-    PASO C — IR DIRECTO A EJECUCIÓN (sin confirmación en MODO EXAMEN):
-      No presentar plan ni pedir "¿es correcto?". Solo ejecutar.
-      Mostrar resumen de 3 líneas antes de inyectar:
-      "Configurando: Router0 Fa0/0=10.x.x.1/24, Se2/0=10.0.0.1/30 | RIP V2 | NAT en Router0."
-      → Continuar a FASE 3 inmediatamente.
-      SOLO PAUSAR si hay [CONFLICTO CRÍTICO] que haría fallar toda la config:
-      → "⚠️ [pregunta de 1 línea — ej: ¿NAT en Router0 o Router1?]"
-      → Esperar respuesta y ejecutar sin más preguntas.
-      ⚠️ Routing ausente → única excepción: preguntar antes de asumir.
-      Todos los demás defaults → aplicar sin avisar.
-
-  FASE 3 — PASO A: CONFIGURAR ROUTERS + IPs ESTÁTICAS (en paralelo):
-    ⛔ NO activar DHCP en los hosts aquí.
-    En UN SOLO mensaje paralelo enviar AMBOS grupos:
-    GRUPO A — Routers:
-      Para cada router → armar bloque CLI completo e inyectar:
-        pt_send_raw('configureIosDevice("RouterX", "enable\nconfigure terminal\n...")')
-      (todos los routers EN PARALELO)
-    GRUPO B — Dispositivos con IP estática (servidores, PCs fijos):
-      → Identificados en FASE 2 PASO A/B con IP fija asignada.
-      → No dependen del IOS engine → se envían en el mismo mensaje que los routers.
-        ⚠️ BUG CONOCIDO: configurePcIp() NO funciona en Server-PT — usar pt_configure_server_static o pt_configure_ip:
-        pt_configure_server_static(device="Server1", ip="10.x.x.2", mask="255.x.x.x", gateway="10.x.x.1")  ← preferida (IP + puede activar HTTP/DHCP pool)
-        pt_configure_ip(device="Server0", ip="10.x.x.x", mask="255.x.x.x", gateway="10.x.x.x")  ← alternativa (solo IP)
-        Para PC-PT/Laptop-PT con IP estática SÍ se puede usar configurePcIp:
-        pt_send_raw('configurePcIp("PC0", false, "10.x.x.x", "255.x.x.x", "10.x.x.x")')
-      (todos los estáticos EN PARALELO con los routers)
-    Reglas de blindaje Anti-Fallos PT obligatorias:
-      • clock rate 64000 → SIEMPRE en interfaces seriales DCE.
-      • STP wait → si hay Switch, incluir time.sleep(30) en el script Python después de activar puertos hacia Switches.
-      • Nombre lógico CLI: usar el nombre real de interfaz que devolvió pt_query_links()
-        (ej: si el API dijo "FastEthernet0/0", usar "Fa0/0" en el bloque CLI).
-    ⚠️ MENSAJE OBLIGATORIO AL USUARIO DESPUÉS DE ESTE PASO:
-      "¡IMPORTANTE! Abre manualmente la pestaña 'CLI' de cada router en PT al menos una vez
-       para despertar el motor IOS. Cuando termines, respóndeme LISTO."
-
-  FASE 4 — PASO B: ACTIVAR DHCP EN HOSTS (solo tras confirmación):
-    → Solo ejecutar cuando el usuario responda "LISTO".
-    → Solo aplica a hosts con DHCP (PCs, Laptops sin IP estática asignada).
-    → Para cada host DHCP: renovar IP 2 veces (false → true) para forzar nueva solicitud.
-      Para PC-PT/Laptop-PT:
-        pt_send_raw('configurePcIp("PC0", false, "0.0.0.0", "0.0.0.0", "0.0.0.0")')
-        pt_send_raw('configurePcIp("PC0", true)')
-      Para Server-PT (configurePcIp NO funciona):
-        pt_configure_ip(device="Server0", dhcp=True)
-    (todos los hosts DHCP EN PARALELO en un solo mensaje)
-    → "¡Red operativa! Verifica con ping [gateway] desde cada PC."
-```
-
-**Funciones JS reales en pt_send_raw:**
-- `configureIosDevice(name, cliBlock)` → aplica CLI IOS completo a router/switch existente
-- `configurePcIp(name, dhcp)` o `configurePcIp(name, false, ip, mask, gw)` → IP de PC-PT y Laptop-PT SOLAMENTE
-- `addDevice / addLink` → solo para topología nueva
-
-**Tools MCP dedicadas para end-devices:**
-- `pt_configure_ip(device, dhcp, ip, mask, gateway, dns)` → funciona en TODOS los end-devices (PC-PT, Server-PT, Laptop-PT)
-  - Usar para Server-PT cuando solo se necesita configurar la IP
-  - Para PC-PT/Laptop-PT se puede usar cualquiera de las dos
-- `pt_configure_server_static(device, ip, mask, gateway, dns, http_enabled, dhcp_pool_start, dhcp_pool_end)` → **NUEVA** — especializada para Server-PT
-  - Usar cuando el servidor necesita IP + activar servicio HTTP o configurar pool DHCP
-  - Ejemplos: `pt_configure_server_static(device="Server0", ip="10.x.x.x", mask="255.x.x.x", gateway="10.x.x.1")`
-  - Con HTTP: `pt_configure_server_static(device="Server0", ip="10.x.x.x", http_enabled=True)`
-  - Con DHCP pool: `pt_configure_server_static(device="Server0", ip="...", dhcp_pool_start="...", dhcp_pool_end="...")`
-
-**Regla de decisión para Server-PT:**
-- Solo IP → usar `pt_configure_ip`
-- IP + HTTP o DHCP pool → usar `pt_configure_server_static`
-
-**Reglas clave:**
-- Siempre Router-PT y Switch 2960-24TT (pasar `router_model="Router-PT"` a pt_full_build)
-- 2+ routers → preguntar: ¿serial o ethernet? ¿qué enrutamiento?
-- clock rate 64000 → SIEMPRE en enlaces seriales (no opcional)
-- STP 30s → SIEMPRE esperar antes de pedir DHCP cuando hay Switches
-- Si faltan puertos → pausar, indicar qué módulo agregar manualmente en PT
-- NAT/ACL/VLANs/helper-address → incluir en el bloque CLI de configureIosDevice (no soportados por generador)
-- NUNCA spawning agentes, NUNCA inventar datos, NUNCA usar tools que no existen
+**Acción**: Invocar `/cisco-pt` — contiene Modo Normal, Modo Examen (4 fases), JS API, VLSM, NAT, RIP, DHCP, VLANs, helper-address, bug Server-PT y plantillas CLI completas.
 
 
 ### CATEGORIA N — Performance & Monitoreo
@@ -1385,21 +1231,13 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 - **DELIVERY**: documentation-engineer (postmortem) + performance-engineer (profiling) + wshobson-distributed-debugging-devops-troubleshooter (infra)
 **Skills**: /sc:troubleshoot
 
-### Ejemplo 3 — Topología de red (13 agentes vía skill dedicado)
+### Ejemplo 3 — Topología de red (skill dedicada)
 ```
 /orquesta Crea una topología con 2 routers, 3 switches y 6 PCs con VLANs
 ```
-**Decisión**: Categoría M (redes) → **delega a skill `cisco-packet-tracer.md`**
-**MCPs**: packet-tracer (25 tools, `C:\Users\Andrea\Desktop\MCP-Packet-Tracer`) + sequential-thinking
-**13 agentes en 4 sub-bloques**:
-- **COMMAND CENTER**: network-commander + document-analyzer + topology-planner
-- **EXECUTION**: network-engineer + network-support + network-architect + cli-specialist
-- **QUALITY GATE**: network-qa + security-auditor + connectivity-tester
-- **DELIVERY**: network-documenter + performance-optimizer + delivery-manager
-**Modo Velocidad**: Tridente de 3 agentes en paralelo → topología lista en segundos
-**SLA**: 15 minutos máximo con diagnóstico automático
-**Flujo**: Análisis → Plan → pt_create_topology → pt_add_device (paralelo) → pt_add_link (puertos auto-asignados) → pt_configure_interface → pt_send_cli → pt_check_connection
-**Nota**: 2 routers detectados → pregunta obligatoria: ¿conexión serial entre routers? ¿enrutamiento? Puertos se asignan automáticamente (no se leen del MCP)
+**Decisión**: Categoría M (redes) → **invocar `/cisco-pt`** directamente
+**MCP**: `packet-tracer` — sin agentes
+**Flujo**: `/cisco-pt` detecta modo (Normal/Examen) y ejecuta las 4 fases automáticamente
 
 ### Ejemplo 4 — Auditoría de seguridad (10 agentes)
 ```
