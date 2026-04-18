@@ -438,23 +438,6 @@ Calcular de mayor a menor número de hosts:
 
 ## Plantillas CLI por protocolo
 
-### Configuración básica (SIEMPRE incluir en todo router)
-```
-hostname [NOMBRE]
-no ip domain-lookup
-enable secret cisco123
-service password-encryption
-banner motd #Acceso restringido#
-line console 0
- password consola123
- login
- logging synchronous
-line vty 0 4
- password remoto123
- login
- transport input ssh
-```
-
 ### SSH seguro
 ```
 ip domain-name empresa.local
