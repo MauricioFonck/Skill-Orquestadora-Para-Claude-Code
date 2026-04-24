@@ -147,7 +147,7 @@ Sugerencia: "actualiza el grafo" para que el índice refleje los cambios.
 1. **Token-first**: Usar `context-mode` de fondo siempre. Antes de leer archivos, usar `qmd` o `context-mode` para buscar. Nunca releer el mismo archivo (read-once hook activo).
 2. **Paralelo cuando se pueda**: Si hay subtareas independientes → lanzar múltiples agentes simultáneamente. Para tareas complejas usar `swarm-orchestration` o `swarm-advanced`.
 3. **Herramienta correcta**: Nunca usar Bash si hay un MCP dedicado. Nunca usar fetch si firecrawl da mejor resultado.
-4. **Memoria en capas**: Al inicio recuperar contexto de 3 fuentes en paralelo: `memory` MCP + AgentDB + Obsidian Vault (`C:/Users/Andrea/Documents/MiVault/STATE.md`). Al final guardar con `automation:session-memory` y actualizar `STATE.md`. **El hook `SessionEnd` en `~/.claude/settings.json` dispara un agente IA automáticamente al cerrar Claude Code** — clasifica el transcript en DIARIO / CONCEPTOS / PROYECTOS y guarda en el vault con wikilinks. Esto es global: funciona desde CUALQUIER directorio de trabajo.
+4. **Memoria en capas**: Al inicio recuperar contexto de 4 fuentes en paralelo: `memory` MCP + AgentDB + Obsidian Vault (`C:/Users/Andrea/Documents/MiVault/STATE.md`) + **claude-mem** (buscar con `/mem-search` en sesiones previas). Al final guardar con `automation:session-memory` y actualizar `STATE.md`. **El hook `SessionEnd` en `~/.claude/settings.json` dispara un agente IA automáticamente al cerrar Claude Code** — clasifica el transcript en DIARIO / CONCEPTOS / PROYECTOS y guarda en el vault con wikilinks. **claude-mem captura automáticamente tool usage y genera resúmenes semánticos buscables** — no requiere acción explícita, sus hooks graban en segundo plano. Todo es global: funciona desde CUALQUIER directorio de trabajo.
 5. **SONA neural router**: Claude-flow aprende de cada request y mejora el routing automáticamente — confiar en su selección de agentes cuando está activo.
 6. **SPARC para features complejas**: Usar metodología SPARC (Spec → Pseudocode → Architecture → Refinement → Completion) para features con múltiples componentes.
 7. **10 agentes por categoría**: Siempre desplegar el squad completo de 10 agentes organizados en 3 sub-bloques concurrentes (Core → Quality Gate → Delivery).
@@ -538,7 +538,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 ---
 
 ### CATEGORIA I — Revisión & Refactoring
-**Señales**: "revisa", "refactoriza", "mejora", "optimiza código", "limpia", "code review", "technical debt"
+**Señales**: "revisa", "refactoriza", "mejora", "optimiza código", "limpia", "code review", "technical debt", "limpieza profunda", "dead code", "código no utilizado", "unused", "CSS sin usar", "dependencias sin usar", "assets huérfanos"
 
 **MCPs que activar**:
 - `code-review-graph` → **PRIMERO** si existe `.code-review-graph/`: mapa completo del módulo, dependencias, comunidades de código relacionadas. Base para decidir qué refactorizar sin romper nada.
@@ -546,7 +546,11 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 - `sequential-thinking` → para refactors complejos
 - `filesystem` → leer código a revisar
 
-**Squad de 10 agentes**:
+**Routing de skill especializada**:
+- Si la intención es **limpieza profunda / eliminar código no utilizado / auditoría de dead code** (señales: "limpieza profunda", "dead code", "código sin usar", "CSS no utilizado", "dependencias huérfanas", "assets sin referencia") → **delegar a `/deep-code-cleanup`** en vez de spawneear el squad genérico. La skill es language-agnostic, produce `CLEANUP_REPORT.md` con tiers HIGH/MEDIUM/LOW y pide confirmación por categoría antes de borrar.
+- Si la intención es **refactor / code review general** → usar el squad de 10 agentes abajo.
+
+**Squad de 10 agentes** (para refactor general, NO para dead-code cleanup):
 
 | # | Dimensión | Agente |
 |---|-----------|--------|
@@ -561,7 +565,7 @@ Al recibir la petición, clasificarla en una o más de estas categorías:
 | 9 | Refactoring | `code-analyzer` |
 | 10 | DevEx / Automatización | `dependency-manager` |
 
-**Skills**: `/sc:improve`, `/sc:cleanup`, `/sc:analyze`
+**Skills**: `/deep-code-cleanup` (limpieza profunda multi-lenguaje con reporte + confirmación), `/sc:improve`, `/sc:cleanup`, `/sc:analyze`
 
 ---
 
@@ -1329,6 +1333,7 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 ```
 1. RECUPERAR contexto (en paralelo):
    - memory MCP + AgentDB → contexto técnico previo
+   - claude-mem → buscar con `/mem-search [tema]` en sesiones previas (automático, cross-sesión)
    - Leer C:/Users/Andrea/Documents/MiVault/STATE.md → estado de proyectos activos
 2. CLASIFICAR tarea → una o más categorías (A-S2)
 3. SELECCIONAR herramientas → MCPs + Squad de 10 agentes + Skills óptimos
@@ -1432,6 +1437,51 @@ Para tareas que activan 4+ categorías simultáneamente, escalar a claude-flow s
 - **SuperPowers** → instalado globalmente para automatización de proyectos existentes. Usar con `npx superpowers@latest init` en proyectos existentes.
 - **security-guard.cjs** (`~/.claude/helpers/security-guard.cjs`) → hook PreToolUse que bloquea operaciones destructivas. Activo en TODOS los proyectos globalmente. Bloquea: rm -rf en sistema, DROP en producción, force push a main, curl|bash, sobreescritura de .env.
 
+### Claude-Mem — Memoria Persistente Automática (Plugin thedotmack)
+- **Repo**: `https://github.com/thedotmack/claude-mem` — plugin oficial de thedotmack
+- **Versión instalada**: `12.3.9` (vía `npx claude-mem install`)
+- **Instalado en AMBAS instancias de Claude Code**:
+  - `claude` → `C:/Users/Andrea/.claude/plugins/marketplaces/thedotmack/`
+  - `claude2` → `C:/Users/Andrea/.claude-pro2/plugins/marketplaces/thedotmack/`
+- **Qué hace**: captura automáticamente tool usage + genera resúmenes semánticos → búsqueda inteligente de contexto de sesiones previas sin esfuerzo manual
+- **Viewer web**: `http://localhost:37777` — stream de memoria en tiempo real (activo cuando corre el worker)
+- **Worker opcional**: `npx claude-mem start` (los hooks ya graban sin él; el worker añade el viewer web)
+- **Privacidad**: envolver contenido sensible en `<private>...</private>` para excluirlo
+
+**Arquitectura técnica**:
+- 5 lifecycle hooks que gestionan eventos de sesión (SessionStart/End, PreToolUse, etc.)
+- SQLite + FTS5 para búsqueda textual rápida
+- Chroma vector DB para búsqueda híbrida semántica/keyword
+- Worker Bun en puerto 37777
+- 4 MCP tools para queries inteligentes de contexto
+
+**Comandos disponibles en Claude Code**:
+| Comando | Para qué |
+|---------|----------|
+| `/mem-search [query]` | Buscar contexto en sesiones previas usando lenguaje natural |
+| `/plugin` | Gestionar plugins del marketplace thedotmack |
+
+**Cómo reinstalar** (referencia — ya está instalado):
+```bash
+# claude (principal)
+CLAUDE_CONFIG_DIR="C:/Users/Andrea/.claude" npx -y claude-mem install
+
+# claude2 (Pro2)
+CLAUDE_CONFIG_DIR="C:/Users/Andrea/.claude-pro2" npx -y claude-mem install
+```
+
+**Relación con las otras capas de memoria**:
+| Capa | Ámbito | Cuándo usarla |
+|------|--------|---------------|
+| `memory` MCP | Por proyecto | Guardar hallazgos técnicos específicos manualmente |
+| AgentDB | Cross-proyecto | Vector search de patrones aprendidos por claude-flow |
+| Obsidian Vault | Global curado | Notas humanas + diario + wikilinks |
+| **claude-mem** | **Global automático** | **Recuperar contexto de sesiones pasadas con `/mem-search`** |
+
+> ⚠️ **Importante**: `npm install -g claude-mem` NO es suficiente — solo instala el SDK sin los hooks ni el worker. Siempre usar `npx claude-mem install` para activar el sistema completo.
+
+---
+
 ### Obsidian Vault — Memoria Persistente Cross-Sesión
 - **Vault**: `C:/Users/Andrea/Documents/MiVault/`
 - **STATE.md**: estado actual de proyectos — leer al inicio de cada sesión
@@ -1503,6 +1553,9 @@ Categorías: accessibility, agent-orchestration, agent-teams, api-scaffolding, b
 
 ### Skill UI/UX
 `/ui-ux-pro-max` → diseño con 50+ estilos, 161 paletas, 57 font pairings, 10 stacks
+
+### Skill Deep Code Cleanup
+`/deep-code-cleanup` → limpieza profunda empresarial multi-lenguaje (JS/TS, Python, Java, Go, C#, Rust, PHP, Ruby + CSS/SCSS + assets + deps). Detecta archivos huérfanos, exports no usados, selectores CSS sin uso, dependencias no importadas, assets sin referencia y ramas de código muerto. Produce `CLEANUP_REPORT.md` con tiers HIGH/MEDIUM/LOW. Reporte primero, confirmación por categoría antes de borrar. Branch dedicada `chore/deep-cleanup-YYYYMMDD`, commits atómicos con build+tests+lint entre cada uno.
 
 ### Herramientas de productividad
 - `ccusage` → análisis de tokens usados
